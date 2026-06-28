@@ -26,7 +26,10 @@ jobs:
       - name: Generate posts
         run: node scripts/auto-generate.mjs
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           POST_COUNT: ${{ github.event.inputs.count || '1' }}
 
       - name: Commit new posts

@@ -23,7 +23,7 @@ export default async function BlogPage() {
           {posts.length} articles
         </p>
       </div>
-      <AdSlot slot="1234567890" className="mb-8" />
+      <AdSlot slot="9200777134" className="mb-8" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8">
         {posts.map((post) => (
           <BlogCard key={post.slug} post={post} />

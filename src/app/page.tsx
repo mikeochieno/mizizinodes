@@ -46,7 +46,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <AdSlot slot="1234567890" className="my-8" />
+      <AdSlot slot="9200777134" className="my-8" />
 
       <section className="mt-12 pt-10 border-t border-zinc-200 dark:border-zinc-800">
         <SectionHeader title="Latest Stories" href="/blog" />

@@ -130,16 +130,30 @@ function categorize(title: string): string {
     t.includes("ai") ||
     t.includes("chatgpt") ||
     t.includes("machine learning") ||
-    t.includes("openai")
+    t.includes("openai") ||
+    t.includes("llm") ||
+    t.includes("neural")
   )
     return "AI";
+  if (
+    t.includes("world cup") ||
+    t.includes("soccer") ||
+    t.includes("football") ||
+    t.includes("nfl") ||
+    t.includes("nba") ||
+    t.includes("espn") ||
+    t.includes("champions") ||
+    t.includes("olympic")
+  )
+    return "Sports";
   if (
     t.includes("apple") ||
     t.includes("google") ||
     t.includes("microsoft") ||
     t.includes("meta") ||
     t.includes("tesla") ||
-    t.includes("amazon")
+    t.includes("amazon") ||
+    t.includes("nvidia")
   )
     return "Tech";
   if (
@@ -148,7 +162,9 @@ function categorize(title: string): string {
     t.includes("python") ||
     t.includes("code") ||
     t.includes("css") ||
-    t.includes("typescript")
+    t.includes("typescript") ||
+    t.includes("developer") ||
+    t.includes("software")
   )
     return "Dev";
   if (
@@ -158,6 +174,24 @@ function categorize(title: string): string {
     t.includes("interface")
   )
     return "Design";
+  if (
+    t.includes("stock") ||
+    t.includes("market") ||
+    t.includes("finance") ||
+    t.includes("bank") ||
+    t.includes("economy") ||
+    t.includes("ipo")
+  )
+    return "Business";
+  if (
+    t.includes("film") ||
+    t.includes("movie") ||
+    t.includes("music") ||
+    t.includes("game") ||
+    t.includes("celebrity") ||
+    t.includes("hollywood")
+  )
+    return "Entertainment";
   return "News";
 }
 

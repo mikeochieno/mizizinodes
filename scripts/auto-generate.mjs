@@ -11,10 +11,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const postsDir = path.resolve(__dirname, "..", "content", "posts");
 
 const RSS_FEEDS = [
+  "https://trends.google.com/trending/rss?geo=US",
   "https://hnrss.org/frontpage",
-  "https://techcrunch.com/feed/",
-  "https://www.theverge.com/rss/index.xml",
-  "https://feeds.feedburner.com/TheNextWeb",
+  "https://feeds.bbci.co.uk/news/rss.xml",
+  "https://www.espn.com/espn/rss/news",
 ];
 
 const parser = new Parser();
@@ -76,10 +76,10 @@ const CATEGORIES = [
   "Software Development",
   "Tech Industry",
   "Science & Space",
-  "Cybersecurity",
-  "Mobile & Apps",
-  "Gaming",
-  "Startups",
+  "World News & Politics",
+  "Sports",
+  "Entertainment",
+  "Business & Finance",
 ];
 
 function buildPrompt(topic, assignedCategory) {

@@ -11,6 +11,7 @@ export type StoredPost = {
   title: string;
   date: string;
   tags: string[];
+  image?: string;
   excerpt: string;
   author: string;
   content: string;
@@ -90,6 +91,7 @@ function getPostsFromFS(): StoredPost[] {
         title: data.title || slug,
         date: data.date || "",
         tags: data.tags || [],
+        image: data.image || "",
         excerpt: data.excerpt || "",
         author: data.author || "",
         content: content.trim(),
@@ -100,10 +102,11 @@ function getPostsFromFS(): StoredPost[] {
 
 function writePostToFS(data: StoredPost): void {
   const tagStr = data.tags.map((t) => `"${t}"`).join(", ");
+  const imageLine = data.image ? `\nimage: "${data.image}"` : "";
   const frontmatter = `---
 title: "${data.title.replace(/"/g, '\\"')}"
 date: "${data.date}"
-tags: [${tagStr}]
+tags: [${tagStr}]${imageLine}
 excerpt: "${data.excerpt.replace(/"/g, '\\"')}"
 author: "${data.author.replace(/"/g, '\\"')}"
 ---

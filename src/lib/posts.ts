@@ -5,6 +5,7 @@ export type PostMeta = {
   title: string;
   date: string;
   tags: string[];
+  image?: string;
   excerpt: string;
   author: string;
   readingTime: string;
@@ -17,6 +18,7 @@ export async function getAllPosts(): Promise<PostMeta[]> {
     title: p.title,
     date: p.date,
     tags: p.tags,
+    image: p.image,
     excerpt: p.excerpt,
     author: p.author,
     readingTime: calculateReadingTime(p.content),

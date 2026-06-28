@@ -206,8 +206,8 @@ export async function getLocalPosts(): Promise<TrendingPost[]> {
         excerpt: p.excerpt || "",
         source: p.author || "MiziziNodes",
         sourceUrl: `/blog/${p.slug}`,
-        category: p.tags.length > 0 ? categorize(p.tags[0]) : "News",
-        image: `https://picsum.photos/seed/${p.slug}/800/450`,
+        category: p.tags.length > 0 ? (categorize(p.tags[0]) === "News" ? categorize(p.title) : categorize(p.tags[0])) : "News",
+        image: (p as any).image || `https://picsum.photos/seed/${p.slug}/800/450`,
       }))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   } catch {

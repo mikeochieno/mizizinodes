@@ -102,11 +102,13 @@ Requirements:
 - Author: AI Editor
 - Excerpt: 2-3 sentence summary that hooks the reader
 - Content: 600-1000 words, well-structured with paragraphs and subheadings (##), engaging tone, factual, feels like original journalism not a summary
+- IMAGE_PROMPT: a detailed DALL-E 3 prompt (30-50 words) for a photorealistic, news-style image to accompany this article
 
 Respond in this exact format:
 TITLE: <title>
 TAGS: <tag1, tag2, tag3, tag4>
 EXCERPT: <excerpt>
+IMAGE_PROMPT: <prompt>
 CONTENT:
 <content in markdown>`;
 }
@@ -115,16 +117,18 @@ function parseResponse(text) {
   const titleMatch = text.match(/TITLE:\s*(.+)/);
   const tagsMatch = text.match(/TAGS:\s*(.+)/);
   const excerptMatch = text.match(/EXCERPT:\s*(.+)/);
+  const imageMatch = text.match(/IMAGE_PROMPT:\s*(.+)/);
   const contentMatch = text.match(/CONTENT:\s*([\s\S]+)/);
   return {
     title: titleMatch?.[1]?.trim() || "",
     tags: (tagsMatch?.[1]?.trim() || "tech").split(",").map((t) => t.trim().toLowerCase()),
     excerpt: excerptMatch?.[1]?.trim() || "",
+    imagePrompt: imageMatch?.[1]?.trim() || "",
     content: contentMatch?.[1]?.trim() || "",
   };
 }
 
-function writePost(title, tags, excerpt, content) {
+function writePost(title, tags, excerpt, image, content) {
   const slug = slugify(title);
   if (!slug) throw new Error("Could not generate slug");
 
@@ -145,6 +149,7 @@ function writePost(title, tags, excerpt, content) {
 title: "${title.replace(/"/g, '\\"')}"
 date: "${date}"
 tags: [${tagStr}]
+image: "${image}"
 excerpt: "${excerpt.replace(/"/g, '\\"')}"
 author: "AI Editor"
 ---
@@ -159,7 +164,48 @@ ${content}
   const filePath = path.join(postsDir, `${finalSlug}.mdx`);
   fs.writeFileSync(filePath, frontmatter, "utf-8");
   console.log(`✅ [${providerName}] Generated: ${title} → content/posts/${finalSlug}.mdx`);
-  return true;
+  return finalSlug;
+}
+
+function addImageToPost(slug, imagePath) {
+  const filePath = path.join(postsDir, `${slug}.mdx`);
+  let content = fs.readFileSync(filePath, "utf-8");
+  content = content.replace(/^image: ""$/m, `image: "${imagePath}"`);
+  fs.writeFileSync(filePath, content, "utf-8");
+}
+
+async function generateImage(slug, prompt) {
+  for (const cfg of PROVIDERS) {
+    if (!cfg.apiKey()) continue;
+    if (cfg.type !== "openai") continue;
+    try {
+      const client = new OpenAI({
+        apiKey: cfg.apiKey(),
+        baseURL: cfg.baseURL || undefined,
+      });
+      const response = await client.images.generate({
+        model: "dall-e-3",
+        prompt: prompt.slice(0, 1000),
+        n: 1,
+        size: "1792x1024",
+        quality: "standard",
+      });
+      const url = response.data[0]?.url;
+      if (!url) throw new Error("No image URL returned");
+      const imgRes = await fetch(url);
+      if (!imgRes.ok) throw new Error("Failed to download image");
+      const buffer = Buffer.from(await imgRes.arrayBuffer());
+      const imgDir = path.resolve(__dirname, "..", "public", "images");
+      if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir, { recursive: true });
+      const imgPath = path.join(imgDir, `${slug}.png`);
+      fs.writeFileSync(imgPath, buffer);
+      console.log(`  🖼  Image saved: /images/${slug}.png`);
+      return `/images/${slug}.png`;
+    } catch (err) {
+      console.log(`  🖼  Image gen failed (${cfg.name}): ${err.message.slice(0, 80)}`);
+    }
+  }
+  return "";
 }
 
 let providerName = "";
@@ -180,10 +226,12 @@ async function tryOpenAI(cfg, topic, category) {
   const text = response.choices[0]?.message?.content;
   if (!text) throw new Error("Empty response");
 
-  const { title, tags, excerpt, content } = parseResponse(text);
+  const { title, tags, excerpt, imagePrompt, content } = parseResponse(text);
   if (!title) throw new Error("Could not parse title from response");
   providerName = cfg.name;
-  writePost(title, tags, excerpt, content);
+  const slug = writePost(title, tags, excerpt, "", content);
+  const image = await generateImage(slug, imagePrompt);
+  if (image) addImageToPost(slug, image);
 }
 
 async function tryGemini(cfg, topic, category) {
@@ -193,10 +241,12 @@ async function tryGemini(cfg, topic, category) {
   const text = result.response.text();
   if (!text) throw new Error("Empty response");
 
-  const { title, tags, excerpt, content } = parseResponse(text);
+  const { title, tags, excerpt, imagePrompt, content } = parseResponse(text);
   if (!title) throw new Error("Could not parse title from response");
   providerName = cfg.name;
-  writePost(title, tags, excerpt, content);
+  const slug = writePost(title, tags, excerpt, "", content);
+  const image = await generateImage(slug, imagePrompt);
+  if (image) addImageToPost(slug, image);
 }
 
 async function generateWithFallback(topic, category) {

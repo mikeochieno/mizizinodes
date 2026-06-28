@@ -73,11 +73,14 @@ export default async function Home() {
 
       {fromUs.length > 0 && (
         <section className="mt-12 pt-10 border-t border-zinc-200 dark:border-zinc-800">
-          <SectionHeader title="From Us" />
+          <SectionHeader title="More Stories" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {fromUs.map((post) => (
-              <FromUsCard key={post.slug} post={post} />
-            ))}
+            {fromUs
+              .filter((p) => !posts.slice(0, 10).find((pp) => pp.slug === p.slug))
+              .slice(0, 4)
+              .map((post) => (
+                <FromUsCard key={post.slug} post={post} />
+              ))}
           </div>
         </section>
       )}
@@ -96,7 +99,7 @@ function TrendingBar() {
       </span>
       <span className="w-px h-4 bg-zinc-300 dark:bg-zinc-700 shrink-0" />
       <span className="text-xs text-zinc-500 truncate">
-        Top stories from across the web
+        Original stories by MiziziNodes
       </span>
     </div>
   );

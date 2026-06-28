@@ -59,8 +59,14 @@ export async function getTrendingPosts(): Promise<TrendingPost[]> {
     return cache.data;
   }
 
+  const local = await getLocalPosts();
+  if (local.length >= 4) {
+    cache = { data: local, timestamp: Date.now() };
+    return local;
+  }
+
   try {
-    const all: TrendingPost[] = [];
+    const all: TrendingPost[] = [...local];
 
     for (const feedUrl of RSS_FEEDS) {
       try {
@@ -83,9 +89,7 @@ export async function getTrendingPosts(): Promise<TrendingPost[]> {
             });
           }
         }
-      } catch {
-        /* skip failed feed */
-      }
+      } catch {}
     }
 
     const seen = new Set<string>();
@@ -98,7 +102,7 @@ export async function getTrendingPosts(): Promise<TrendingPost[]> {
     cache = { data: unique, timestamp: Date.now() };
     return unique;
   } catch {
-    return getFallback();
+    return local.length > 0 ? local : getFallback();
   }
 }
 
@@ -160,16 +164,18 @@ function categorize(title: string): string {
 export async function getLocalPosts(): Promise<TrendingPost[]> {
   try {
     const posts = await getAllPosts();
-    return posts.map((p: { slug: string; title: string; date: string; excerpt: string; author: string; tags: string[] }) => ({
-      slug: p.slug,
-      title: p.title,
-      date: p.date,
-      excerpt: p.excerpt || "",
-      source: p.author || "From Us",
-      sourceUrl: `/blog/${p.slug}`,
-      category: "From Us",
-      image: `https://picsum.photos/seed/${p.slug}/800/450`,
-    }));
+    return posts
+      .map((p) => ({
+        slug: p.slug,
+        title: p.title,
+        date: p.date,
+        excerpt: p.excerpt || "",
+        source: p.author || "MiziziNodes",
+        sourceUrl: `/blog/${p.slug}`,
+        category: p.tags.length > 0 ? categorize(p.tags[0]) : "News",
+        image: `https://picsum.photos/seed/${p.slug}/800/450`,
+      }))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   } catch {
     return [];
   }

@@ -71,22 +71,33 @@ async function fetchTrending() {
   return items;
 }
 
-function buildPrompt(topic) {
-  return `You are a tech journalist. Write a well-researched, engaging blog post about this trending topic:
+const CATEGORIES = [
+  "AI & Machine Learning",
+  "Software Development",
+  "Tech Industry",
+  "Science & Space",
+  "Cybersecurity",
+  "Mobile & Apps",
+  "Gaming",
+  "Startups",
+];
+
+function buildPrompt(topic, assignedCategory) {
+  return `You are a tech journalist. Write a well-researched, engaging, original blog post about this trending topic:
 
 "${topic.title}" (source: ${topic.source})
 
 Requirements:
 - Title: compelling headline
 - Date: today's date (${new Date().toISOString().split("T")[0]})
-- Tags: 3-4 relevant tags (comma separated, lowercase)
+- Tags: 4-5 relevant tags including "${assignedCategory.toLowerCase()}" (comma separated, lowercase)
 - Author: AI Editor
-- Excerpt: 1-2 sentence summary
-- Content: 500-800 words, well-structured with paragraphs and subheadings (##), engaging tone, factual
+- Excerpt: 2-3 sentence summary that hooks the reader
+- Content: 600-1000 words, well-structured with paragraphs and subheadings (##), engaging tone, factual, feels like original journalism not a summary
 
 Respond in this exact format:
 TITLE: <title>
-TAGS: <tag1, tag2, tag3>
+TAGS: <tag1, tag2, tag3, tag4>
 EXCERPT: <excerpt>
 CONTENT:
 <content in markdown>`;
@@ -145,7 +156,7 @@ ${content}
 
 let providerName = "";
 
-async function tryOpenAI(cfg, topic) {
+async function tryOpenAI(cfg, topic, category) {
   const client = new OpenAI({
     apiKey: cfg.apiKey(),
     baseURL: cfg.baseURL || undefined,
@@ -153,9 +164,9 @@ async function tryOpenAI(cfg, topic) {
 
   const response = await client.chat.completions.create({
     model: cfg.model,
-    messages: [{ role: "user", content: buildPrompt(topic) }],
+    messages: [{ role: "user", content: buildPrompt(topic, category) }],
     temperature: 0.7,
-    max_tokens: 1500,
+    max_tokens: 2000,
   });
 
   const text = response.choices[0]?.message?.content;
@@ -167,10 +178,10 @@ async function tryOpenAI(cfg, topic) {
   writePost(title, tags, excerpt, content);
 }
 
-async function tryGemini(cfg, topic) {
+async function tryGemini(cfg, topic, category) {
   const genAI = new GoogleGenerativeAI(cfg.apiKey());
   const model = genAI.getGenerativeModel({ model: cfg.model });
-  const result = await model.generateContent(buildPrompt(topic));
+  const result = await model.generateContent(buildPrompt(topic, category));
   const text = result.response.text();
   if (!text) throw new Error("Empty response");
 
@@ -180,7 +191,7 @@ async function tryGemini(cfg, topic) {
   writePost(title, tags, excerpt, content);
 }
 
-async function generateWithFallback(topic) {
+async function generateWithFallback(topic, category) {
   const available = PROVIDERS.filter((p) => p.apiKey());
 
   if (available.length === 0) {
@@ -193,9 +204,9 @@ async function generateWithFallback(topic) {
     try {
       console.log(`  Trying ${cfg.name} (${cfg.model})...`);
       if (cfg.type === "gemini") {
-        await tryGemini(cfg, topic);
+        await tryGemini(cfg, topic, category);
       } else {
-        await tryOpenAI(cfg, topic);
+        await tryOpenAI(cfg, topic, category);
       }
       return true;
     } catch (err) {
@@ -223,13 +234,14 @@ async function main() {
   console.log(`🔑 ${available.length} provider(s) configured: ${available.map((p) => p.name).join(", ") || "none"}`);
   console.log("");
 
-  const count = Math.min(parseInt(process.env.POST_COUNT || "1"), 3);
+  const count = Math.min(parseInt(process.env.POST_COUNT || "3"), 5);
 
   for (let i = 0; i < count; i++) {
-    const topic = trending[i];
-    console.log(`✍️  [${i + 1}/${count}] "${topic.title}"`);
+    const topic = trending[i % trending.length];
+    const category = CATEGORIES[i % CATEGORIES.length];
+    console.log(`✍️  [${i + 1}/${count}] [${category}] "${topic.title}"`);
     try {
-      await generateWithFallback(topic);
+      await generateWithFallback(topic, category);
     } catch (err) {
       console.error(`  ❌ Skipped — ${err.message}`);
     }

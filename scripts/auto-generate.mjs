@@ -102,7 +102,7 @@ Requirements:
 - Author: AI Editor
 - Excerpt: 2-3 sentence summary that hooks the reader
 - Content: 600-1000 words, well-structured with paragraphs and subheadings (##), engaging tone, factual, feels like original journalism not a summary
-- IMAGE_PROMPT: a detailed DALL-E 3 prompt (30-50 words) for a photorealistic, news-style image to accompany this article
+- IMAGE_PROMPT: a short search query (10-20 words) to find a relevant photo for this article on a stock image site — describe the scene/subject visually, e.g. "close up of a person typing code on a laptop" or "soccer player celebrating a goal in stadium"
 
 Respond in this exact format:
 TITLE: <title>
@@ -167,38 +167,66 @@ ${content}
   return finalSlug;
 }
 
-function addImageToPost(slug, imagePath) {
-  const filePath = path.join(postsDir, `${slug}.mdx`);
-  let content = fs.readFileSync(filePath, "utf-8");
-  content = content.replace(/^image: ""$/m, `image: "${imagePath}"`);
-  fs.writeFileSync(filePath, content, "utf-8");
+const IMG_DIR = path.resolve(__dirname, "..", "public", "images");
+
+async function searchImage(query, category) {
+  // tries Pexels → Unsplash, each with 2 queries (imagePrompt → category)
+  const queries = [query, category].filter(Boolean);
+
+  const pexelsKey = process.env.PEXELS_API_KEY;
+  const unsplashKey = process.env.UNSPLASH_API_KEY;
+
+  for (const q of queries) {
+    // try Pexels
+    if (pexelsKey) {
+      try {
+        const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=1&orientation=landscape`;
+        const res = await fetch(url, { headers: { Authorization: pexelsKey } });
+        const data = await res.json();
+        const photo = data.photos?.[0];
+        if (photo) {
+          console.log(`  🖼  Pexels found image for "${q.slice(0, 50)}"`);
+          const imgUrl = photo.src.large2x || photo.src.large;
+          return { url: imgUrl, photographer: photo.photographer };
+        }
+      } catch (e) {
+        console.log(`  🖼  Pexels error: ${e.message.slice(0, 80)}`);
+      }
+    }
+
+    // try Unsplash
+    if (unsplashKey) {
+      try {
+        const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(q)}&per_page=1&orientation=landscape`;
+        const res = await fetch(url, { headers: { Authorization: `Client-ID ${unsplashKey}` } });
+        const data = await res.json();
+        const photo = data.results?.[0];
+        if (photo) {
+          console.log(`  🖼  Unsplash found image for "${q.slice(0, 50)}"`);
+          return { url: photo.urls.regular, photographer: photo.user.name };
+        }
+      } catch (e) {
+        console.log(`  🖼  Unsplash error: ${e.message.slice(0, 80)}`);
+      }
+    }
+  }
+
+  return null;
 }
 
-async function generateImage(slug, prompt) {
-  const key = process.env.OPENCODE_API_KEY;
-  if (!key) return "";
+async function downloadImage(slug, imgResult) {
+  if (!imgResult) return "";
   try {
-    const client = new OpenAI({ apiKey: key });
-    const response = await client.images.generate({
-      model: "dall-e-3",
-      prompt: prompt.slice(0, 1000),
-      n: 1,
-      size: "1792x1024",
-      quality: "standard",
-    });
-    const url = response.data[0]?.url;
-    if (!url) throw new Error("No image URL returned");
-    const imgRes = await fetch(url);
-    if (!imgRes.ok) throw new Error("Failed to download image");
-    const buffer = Buffer.from(await imgRes.arrayBuffer());
-    const imgDir = path.resolve(__dirname, "..", "public", "images");
-    if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir, { recursive: true });
-    const imgPath = path.join(imgDir, `${slug}.png`);
-    fs.writeFileSync(imgPath, buffer);
-    console.log(`  🖼  Image saved: /images/${slug}.png`);
-    return `/images/${slug}.png`;
-  } catch (err) {
-    console.log(`  🖼  Image gen failed: ${err.message.slice(0, 100)}`);
+    const res = await fetch(imgResult.url);
+    if (!res.ok) return "";
+    const buffer = Buffer.from(await res.arrayBuffer());
+    if (!fs.existsSync(IMG_DIR)) fs.mkdirSync(IMG_DIR, { recursive: true });
+    const ext = imgResult.url.match(/\.(jpg|jpeg|png|webp)/i)?.[1] || "jpg";
+    const filename = `${slug}.${ext}`;
+    fs.writeFileSync(path.join(IMG_DIR, filename), buffer);
+    console.log(`  🖼  Image saved: /images/${filename}`);
+    return `/images/${filename}`;
+  } catch {
     return "";
   }
 }
@@ -224,9 +252,11 @@ async function tryOpenAI(cfg, topic, category) {
   const { title, tags, excerpt, imagePrompt, content } = parseResponse(text);
   if (!title) throw new Error("Could not parse title from response");
   providerName = cfg.name;
-  const slug = writePost(title, tags, excerpt, "", content);
-  const image = await generateImage(slug, imagePrompt);
-  if (image) addImageToPost(slug, image);
+  console.log(`  🖼  Searching image for: "${imagePrompt.slice(0, 80) || topic.title}"...`);
+  const imgResult = await searchImage(imagePrompt || topic.title, category);
+  const image = imgResult ? await downloadImage(slugify(title), imgResult) : "";
+  writePost(title, tags, excerpt, image, content);
+  if (image) console.log(`  🖼  Image set: ${image}`);
 }
 
 async function tryGemini(cfg, topic, category) {
@@ -239,9 +269,11 @@ async function tryGemini(cfg, topic, category) {
   const { title, tags, excerpt, imagePrompt, content } = parseResponse(text);
   if (!title) throw new Error("Could not parse title from response");
   providerName = cfg.name;
-  const slug = writePost(title, tags, excerpt, "", content);
-  const image = await generateImage(slug, imagePrompt);
-  if (image) addImageToPost(slug, image);
+  console.log(`  🖼  Searching image for: "${imagePrompt.slice(0, 80) || topic.title}"...`);
+  const imgResult = await searchImage(imagePrompt || topic.title, category);
+  const image = imgResult ? await downloadImage(slugify(title), imgResult) : "";
+  writePost(title, tags, excerpt, image, content);
+  if (image) console.log(`  🖼  Image set: ${image}`);
 }
 
 async function generateWithFallback(topic, category) {

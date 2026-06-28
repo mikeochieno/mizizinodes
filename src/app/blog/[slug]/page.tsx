@@ -47,6 +47,10 @@ export default async function PostPage({ params }: Props) {
           <time>{post.date}</time>
         </div>
 
+        {post.image && (
+          <img src={post.image} alt={post.title} className="mt-6 w-full rounded-xl object-cover aspect-video" />
+        )}
+
         {localPost ? (
           <div
             className="mt-6 prose prose-zinc dark:prose-invert max-w-none"

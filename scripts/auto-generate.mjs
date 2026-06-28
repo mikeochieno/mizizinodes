@@ -82,6 +82,14 @@ const CATEGORIES = [
   "Business & Finance",
 ];
 
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function buildPrompt(topic, assignedCategory) {
   return `You are a tech journalist. Write a well-researched, engaging, original blog post about this trending topic:
 
@@ -234,7 +242,8 @@ async function main() {
   console.log(`🔑 ${available.length} provider(s) configured: ${available.map((p) => p.name).join(", ") || "none"}`);
   console.log("");
 
-  const count = Math.min(parseInt(process.env.POST_COUNT || "3"), 5);
+  shuffle(trending);
+  const count = Math.min(parseInt(process.env.POST_COUNT || "2"), 5);
 
   for (let i = 0; i < count; i++) {
     const topic = trending[i % trending.length];

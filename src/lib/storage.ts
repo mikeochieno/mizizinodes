@@ -21,15 +21,17 @@ function isVercel(): boolean {
 }
 
 export async function getAllStoredPosts(): Promise<StoredPost[]> {
+  let kvPosts: StoredPost[] = [];
   if (isVercel()) {
-    const kvPosts = (await kv.get<StoredPost[]>(POSTS_KEY)) || [];
-    const fsPosts = getPostsFromFS();
-    const merged = new Map<string, StoredPost>();
-    for (const p of fsPosts) merged.set(p.slug, p);
-    for (const p of kvPosts) merged.set(p.slug, p);
-    return Array.from(merged.values()).sort((a, b) => (a.date > b.date ? -1 : 1));
+    try {
+      kvPosts = (await kv.get<StoredPost[]>(POSTS_KEY)) || [];
+    } catch {}
   }
-  return getPostsFromFS();
+  const fsPosts = getPostsFromFS();
+  const merged = new Map<string, StoredPost>();
+  for (const p of fsPosts) merged.set(p.slug, p);
+  for (const p of kvPosts) merged.set(p.slug, p);
+  return Array.from(merged.values()).sort((a, b) => (a.date > b.date ? -1 : 1));
 }
 
 export async function getStoredPost(slug: string): Promise<StoredPost | null> {

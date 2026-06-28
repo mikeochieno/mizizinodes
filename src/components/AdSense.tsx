@@ -3,6 +3,12 @@
 import Script from "next/script";
 import { useEffect, useRef } from "react";
 
+declare global {
+  interface Window {
+    adsbygoogle?: unknown[];
+  }
+}
+
 const adClient = process.env.NEXT_PUBLIC_ADSENSE_ID || "";
 
 export function AdSenseScript() {
@@ -25,19 +31,14 @@ type AdSlotProps = {
 
 export function AdSlot({ slot, format = "auto", className = "" }: AdSlotProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const initialized = useRef(false);
 
   useEffect(() => {
-    if (!adClient || initialized.current) return;
+    if (!adClient) return;
     try {
-      const w = window as unknown as { adsbygoogle?: unknown[] };
-      if (w.adsbygoogle) {
-        w.adsbygoogle.push({});
-      }
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
       /* silent */
     }
-    initialized.current = true;
   }, []);
 
   if (!adClient) return null;

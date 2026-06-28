@@ -39,6 +39,7 @@ jobs:
         run: |
           git config user.name "AI Editor"
           git config user.email "ai@mizizinodes.vercel.app"
+          git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
           git add content/posts/
           if git diff --staged --quiet; then
             echo "No new posts to commit"

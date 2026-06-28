@@ -175,37 +175,32 @@ function addImageToPost(slug, imagePath) {
 }
 
 async function generateImage(slug, prompt) {
-  for (const cfg of PROVIDERS) {
-    if (!cfg.apiKey()) continue;
-    if (cfg.type !== "openai") continue;
-    try {
-      const client = new OpenAI({
-        apiKey: cfg.apiKey(),
-        baseURL: cfg.baseURL || undefined,
-      });
-      const response = await client.images.generate({
-        model: "dall-e-3",
-        prompt: prompt.slice(0, 1000),
-        n: 1,
-        size: "1792x1024",
-        quality: "standard",
-      });
-      const url = response.data[0]?.url;
-      if (!url) throw new Error("No image URL returned");
-      const imgRes = await fetch(url);
-      if (!imgRes.ok) throw new Error("Failed to download image");
-      const buffer = Buffer.from(await imgRes.arrayBuffer());
-      const imgDir = path.resolve(__dirname, "..", "public", "images");
-      if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir, { recursive: true });
-      const imgPath = path.join(imgDir, `${slug}.png`);
-      fs.writeFileSync(imgPath, buffer);
-      console.log(`  🖼  Image saved: /images/${slug}.png`);
-      return `/images/${slug}.png`;
-    } catch (err) {
-      console.log(`  🖼  Image gen failed (${cfg.name}): ${err.message.slice(0, 80)}`);
-    }
+  const key = process.env.OPENCODE_API_KEY;
+  if (!key) return "";
+  try {
+    const client = new OpenAI({ apiKey: key });
+    const response = await client.images.generate({
+      model: "dall-e-3",
+      prompt: prompt.slice(0, 1000),
+      n: 1,
+      size: "1792x1024",
+      quality: "standard",
+    });
+    const url = response.data[0]?.url;
+    if (!url) throw new Error("No image URL returned");
+    const imgRes = await fetch(url);
+    if (!imgRes.ok) throw new Error("Failed to download image");
+    const buffer = Buffer.from(await imgRes.arrayBuffer());
+    const imgDir = path.resolve(__dirname, "..", "public", "images");
+    if (!fs.existsSync(imgDir)) fs.mkdirSync(imgDir, { recursive: true });
+    const imgPath = path.join(imgDir, `${slug}.png`);
+    fs.writeFileSync(imgPath, buffer);
+    console.log(`  🖼  Image saved: /images/${slug}.png`);
+    return `/images/${slug}.png`;
+  } catch (err) {
+    console.log(`  🖼  Image gen failed: ${err.message.slice(0, 100)}`);
+    return "";
   }
-  return "";
 }
 
 let providerName = "";

@@ -4,6 +4,7 @@ import "./globals.css";
 import Script from "next/script";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { AdSenseScript } from "@/components/AdSense";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,16 +16,42 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.SITE_URL || "https://mizizinodes.vercel.app";
+
 export const metadata: Metadata = {
   title: {
-    default: "Blog",
-    template: "%s — Blog",
+    default: "MiziziNodes — Tech News & Insights",
+    template: "%s — MiziziNodes",
   },
-  description: "A modern blog about code, design, and technology",
-  metadataBase: new URL("https://localhost:3000"),
+  description: "Curated tech news, AI breakthroughs, developer tools, and original articles from across the web.",
+  metadataBase: new URL(siteUrl),
   alternates: {
     types: {
       "application/atom+xml": "/feed.xml",
+    },
+  },
+  openGraph: {
+    type: "website",
+    siteName: "MiziziNodes",
+    title: "MiziziNodes — Tech News & Insights",
+    description: "Curated tech news, AI breakthroughs, developer tools, and original articles from across the web.",
+    url: siteUrl,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MiziziNodes",
+    description: "Curated tech news, AI breakthroughs, developer tools, and original articles.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
@@ -48,7 +75,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="alternate" type="application/atom+xml" href="/feed.xml" title="Blog" />
+        <link rel="alternate" type="application/atom+xml" href="/feed.xml" title="MiziziNodes" />
+        <link rel="canonical" href={siteUrl} />
         <Script id="theme-script" strategy="beforeInteractive">
           {`
             (function() {
@@ -59,6 +87,7 @@ export default function RootLayout({
             })();
           `}
         </Script>
+        <AdSenseScript />
       </head>
       <body className="min-h-full flex flex-col bg-white dark:bg-zinc-950 text-black dark:text-zinc-100 transition-colors duration-300">
         <Header />

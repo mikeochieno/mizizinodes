@@ -1,6 +1,10 @@
 import Link from "next/link";
+import Script from "next/script";
 import { getTrendingPosts, getLocalPosts } from "@/lib/trending";
 import type { TrendingPost } from "@/lib/trending";
+import { AdSlot } from "@/components/AdSense";
+
+const siteUrl = process.env.SITE_URL || "https://mizizinodes.vercel.app";
 
 export default async function Home() {
   const posts = await getTrendingPosts();
@@ -11,8 +15,24 @@ export default async function Home() {
   const rest = posts.slice(4, 10);
   const categories = groupByCategory(posts);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "MiziziNodes",
+    url: siteUrl,
+    description: "Curated tech news, AI breakthroughs, developer tools, and original articles from across the web.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${siteUrl}/search?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <div className="px-8 max-w-screen-2xl mx-auto">
+      <Script id="json-ld" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(jsonLd)}
+      </Script>
       <TrendingBar />
 
       {featured && <FeaturedStory post={featured} />}
@@ -25,6 +45,8 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      <AdSlot slot="1234567890" className="my-8" />
 
       <section className="mt-12 pt-10 border-t border-zinc-200 dark:border-zinc-800">
         <SectionHeader title="Latest Stories" href="/blog" />
@@ -100,7 +122,7 @@ function FeaturedStory({ post }: { post: TrendingPost }) {
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-black dark:from-zinc-950 dark:to-black">
           <img
             src={post.image}
-            alt=""
+            alt={post.title}
             className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-500"
           />
           <div className="relative px-6 py-10 sm:px-10 sm:py-16 lg:px-16 lg:py-20">
@@ -128,7 +150,7 @@ function TrendingCard({ post, rank }: { post: TrendingPost; rank: number }) {
         <div className="relative overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-900 mb-3">
           <img
             src={post.image}
-            alt=""
+            alt={post.title}
             className="w-full aspect-[16/10] object-cover"
             loading="lazy"
           />
@@ -152,7 +174,7 @@ function NewsCard({ post }: { post: TrendingPost }) {
         <div className="overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-900 mb-3">
           <img
             src={post.image}
-            alt=""
+            alt={post.title}
             className="w-full aspect-[16/9] object-cover"
             loading="lazy"
           />
@@ -173,7 +195,7 @@ function SmallCard({ post }: { post: TrendingPost }) {
         <div className="overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-900 mb-2.5">
           <img
             src={post.image}
-            alt=""
+            alt={post.title}
             className="w-full aspect-[16/9] object-cover"
             loading="lazy"
           />
@@ -194,7 +216,7 @@ function FromUsCard({ post }: { post: TrendingPost }) {
         <div className="overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-900 mb-3">
           <img
             src={post.image}
-            alt=""
+            alt={post.title}
             className="w-full aspect-[16/9] object-cover group-hover:scale-[1.02] transition-transform duration-300"
             loading="lazy"
           />

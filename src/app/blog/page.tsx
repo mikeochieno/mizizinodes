@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTrendingPosts, getLocalPosts } from "@/lib/trending";
 import type { TrendingPost } from "@/lib/trending";
+import { AdSlot } from "@/components/AdSense";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -22,6 +23,7 @@ export default async function BlogPage() {
           {posts.length} articles
         </p>
       </div>
+      <AdSlot slot="1234567890" className="mb-8" />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8">
         {posts.map((post) => (
           <BlogCard key={post.slug} post={post} />
@@ -40,7 +42,7 @@ function BlogCard({ post }: { post: TrendingPost }) {
         <div className="overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-900 mb-3">
           <img
             src={post.image}
-            alt=""
+            alt={post.title}
             className="w-full aspect-[16/9] object-cover group-hover:scale-[1.02] transition-transform duration-300"
             loading="lazy"
           />

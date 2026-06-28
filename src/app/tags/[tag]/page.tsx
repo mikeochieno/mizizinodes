@@ -56,7 +56,7 @@ function TagCard({ post }: { post: { slug: string; title: string; date: string; 
         <div className="overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-900 mb-3">
           <img
             src={post.image}
-            alt=""
+            alt={post.title}
             className="w-full aspect-[16/9] object-cover group-hover:scale-[1.02] transition-transform duration-300"
             loading="lazy"
           />

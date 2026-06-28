@@ -28,6 +28,11 @@ jobs:
 
       - run: npm ci
 
+      - name: Sync with latest remote
+        run: |
+          git fetch origin main
+          git reset --hard FETCH_HEAD
+
       - name: Generate posts
         run: node scripts/auto-generate.mjs
         env:
@@ -37,9 +42,8 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           POST_COUNT: ${{ github.event.inputs.count || '1' }}
 
-      - name: Commit new posts
+      - name: Commit and push
         run: |
-          set -x
           git config user.name "AI Editor"
           git config user.email "ai@mizizinodes.vercel.app"
           git add content/posts/
@@ -48,8 +52,6 @@ jobs:
             exit 0
           fi
           git commit -m "Auto-generate blog posts [skip ci]"
-          git fetch origin main
-          git rebase FETCH_HEAD
           git push origin main
 
       - name: Trigger Vercel redeploy

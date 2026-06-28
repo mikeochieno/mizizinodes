@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -40,12 +42,14 @@ jobs:
           git config user.name "AI Editor"
           git config user.email "ai@mizizinodes.vercel.app"
           git remote set-url origin https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+          git fetch origin
+          git checkout main
+          git rebase origin/main
           git add content/posts/
           if git diff --staged --quiet; then
             echo "No new posts to commit"
           else
             git commit -m "Auto-generate blog posts [skip ci]"
-            git pull --rebase
             git push
           fi
 

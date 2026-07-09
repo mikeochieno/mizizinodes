@@ -89,6 +89,7 @@ export default function RootLayout({
           `}
         </Script>
         <AdSenseScript />
+        <script src="https://quge5.com/88/tag.min.js" data-zone="258067" async data-cfasync="false"></script>
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-CYN1EK2RBS" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`

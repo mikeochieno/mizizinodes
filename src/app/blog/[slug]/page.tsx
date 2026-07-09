@@ -259,6 +259,30 @@ export default async function PostPage({ params }: Props) {
   );
 }
 
+function htmlEscape(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function highlightCode(code: string, lang: string): string {
+  const escaped = htmlEscape(code);
+  if (!lang) return escaped;
+  const patterns: [RegExp, string][] = [
+    [ /\/\/.*$/gm, '<span class="comment">$&</span>' ],
+    [ /\/\*[\s\S]*?\*\//g, '<span class="comment">$&</span>' ],
+    [ /"(?:\\.|[^"\\])*"/g, '<span class="string">$&</span>' ],
+    [ /'(?:\\.|[^'\\])*'/g, '<span class="string">$&</span>' ],
+    [ /`(?:\\.|[^`\\])*`/g, '<span class="string">$&</span>' ],
+    [ /\b(import|from|export|def|class|return|if|else|elif|for|while|try|except|finally|with|as|async|await|const|let|var|function|new|throw|catch|case|switch|default|break|continue|yield|lambda|pass|in|not|and|or|True|False|None|null|undefined|this|typeof|instanceof|void|delete|do|enum|extends|super|static|private|public|protected|interface|type|implements|abstract|readonly)\b/g, '<span class="keyword">$1</span>' ],
+    [ /\b-?\d+\.?\d*\b/g, '<span class="number">$&</span>' ],
+    [ /\b([a-zA-Z_$][\w$]*)\s*\(/g, '<span class="function">$1</span>(' ],
+  ];
+  let result = escaped;
+  for (const [re, replacement] of patterns) {
+    result = result.replace(re, replacement);
+  }
+  return result;
+}
+
 function mdToHtml(md: string): string {
   let html = md
     .replace(/^### (.+)$/gm, (_, t) => {
@@ -273,9 +297,9 @@ function mdToHtml(md: string): string {
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
     .replace(/`(.+?)`/g, "<code>$1</code>")
     .replace(/^> (.+)$/gm, "<blockquote>$1</blockquote>")
-    .replace(/```[\s\S]*?```/g, (m) => {
-      const code = m.replace(/```\w*\n?/, "").replace(/\n?```$/, "");
-      return `<pre>${code}</pre>`;
+    .replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+      const highlighted = highlightCode(code.trim(), lang);
+      return `<pre><code class="lang-${lang || "none"}">${highlighted}</code></pre>`;
     })
     .replace(/^[\-*] (.+)$/gm, "<li>$1</li>")
     .replace(/(<li>.*<\/li>\n?)+/g, "<ul>$&</ul>")

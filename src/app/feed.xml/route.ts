@@ -1,7 +1,7 @@
 import { getTrendingPosts, getLocalPosts } from "@/lib/trending";
 
 export async function GET() {
-  const baseUrl = "https://localhost:3000";
+  const baseUrl = process.env.SITE_URL || "https://mizizinodes.vercel.app";
   const posts = [...await getLocalPosts(), ...await getTrendingPosts()];
 
   const items = posts

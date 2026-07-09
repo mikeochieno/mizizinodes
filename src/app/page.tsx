@@ -121,7 +121,7 @@ function SectionHeader({ title, href }: { title: string; href?: string }) {
 function FeaturedStory({ post }: { post: TrendingPost }) {
   return (
     <section className="relative">
-      <a href={post.sourceUrl} target="_blank" rel="noopener noreferrer" className="group block">
+      <Link href={`/blog/${post.slug}`} className="group block">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-black dark:from-zinc-950 dark:to-black">
           <img
             src={post.image}
@@ -141,7 +141,7 @@ function FeaturedStory({ post }: { post: TrendingPost }) {
             <time className="block mt-5 text-sm text-white/50">{post.date}</time>
           </div>
         </div>
-      </a>
+      </Link>
     </section>
   );
 }
@@ -149,7 +149,7 @@ function FeaturedStory({ post }: { post: TrendingPost }) {
 function TrendingCard({ post, rank }: { post: TrendingPost; rank: number }) {
   return (
     <article className="group relative">
-      <a href={post.sourceUrl} target="_blank" rel="noopener noreferrer" className="group block text-inherit hover:text-inherit no-underline">
+      <Link href={`/blog/${post.slug}`} className="group block text-inherit hover:text-inherit no-underline">
         <div className="relative overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-900 mb-3">
           <img
             src={post.image}
@@ -165,7 +165,7 @@ function TrendingCard({ post, rank }: { post: TrendingPost; rank: number }) {
           {post.title}
         </h2>
         <time className="block mt-2 text-xs text-zinc-500">{post.date}</time>
-      </a>
+      </Link>
     </article>
   );
 }
@@ -173,7 +173,7 @@ function TrendingCard({ post, rank }: { post: TrendingPost; rank: number }) {
 function NewsCard({ post }: { post: TrendingPost }) {
   return (
     <article className="group">
-      <a href={post.sourceUrl} target="_blank" rel="noopener noreferrer" className="block text-inherit hover:text-inherit no-underline">
+      <Link href={`/blog/${post.slug}`} className="block text-inherit hover:text-inherit no-underline">
         <div className="overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-900 mb-3">
           <img
             src={post.image}
@@ -186,7 +186,7 @@ function NewsCard({ post }: { post: TrendingPost }) {
           {post.title}
         </h2>
         <time className="block mt-2 text-xs text-zinc-500">{post.date}</time>
-      </a>
+      </Link>
     </article>
   );
 }
@@ -194,7 +194,7 @@ function NewsCard({ post }: { post: TrendingPost }) {
 function SmallCard({ post }: { post: TrendingPost }) {
   return (
     <article className="group border-b border-zinc-100 dark:border-zinc-800 pb-4">
-      <a href={post.sourceUrl} target="_blank" rel="noopener noreferrer" className="block text-inherit hover:text-inherit no-underline">
+      <Link href={`/blog/${post.slug}`} className="block text-inherit hover:text-inherit no-underline">
         <div className="overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-900 mb-2.5">
           <img
             src={post.image}
@@ -207,7 +207,7 @@ function SmallCard({ post }: { post: TrendingPost }) {
           {post.title}
         </h3>
         <time className="block mt-1.5 text-xs text-zinc-500">{post.date}</time>
-      </a>
+      </Link>
     </article>
   );
 }
@@ -215,7 +215,7 @@ function SmallCard({ post }: { post: TrendingPost }) {
 function FromUsCard({ post }: { post: TrendingPost }) {
   return (
     <article className="group">
-      <a href={post.sourceUrl} className="block text-inherit hover:text-inherit no-underline">
+      <Link href={post.sourceUrl} className="block text-inherit hover:text-inherit no-underline">
         <div className="overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-900 mb-3">
           <img
             src={post.image}
@@ -235,7 +235,7 @@ function FromUsCard({ post }: { post: TrendingPost }) {
           <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600" />
           <time>{post.date}</time>
         </div>
-      </a>
+      </Link>
     </article>
   );
 }

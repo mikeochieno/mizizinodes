@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Script from "next/script";
 import Link from "next/link";
 import { getPostBySlug, getTrendingPosts, getLocalPosts } from "@/lib/trending";
 import { getPost } from "@/lib/posts";
 
 type Props = { params: Promise<{ slug: string }> };
+
+const siteUrl = process.env.SITE_URL || "https://mizizinodes.vercel.app";
 
 export async function generateStaticParams() {
   const [posts, local] = await Promise.all([getTrendingPosts(), getLocalPosts()]);
@@ -15,7 +18,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPostBySlug(slug);
   if (!post) return {};
-  return { title: post.title, description: post.excerpt };
+  return {
+    title: post.title,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      publishedTime: post.date,
+      url: `${siteUrl}/blog/${post.slug}`,
+      images: post.image ? [{ url: post.image }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: post.image ? [post.image] : [],
+    },
+  };
 }
 
 export default async function PostPage({ params }: Props) {
@@ -25,8 +45,33 @@ export default async function PostPage({ params }: Props) {
 
   const localPost = post.sourceUrl.startsWith("/blog/") ? await getPost(slug) : null;
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: post.title,
+    description: post.excerpt,
+    image: post.image,
+    datePublished: post.date,
+    author: {
+      "@type": "Person",
+      name: post.source || "MiziziNodes",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "MiziziNodes",
+      url: siteUrl,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/blog/${post.slug}`,
+    },
+  };
+
   return (
     <div className="px-8 py-8 max-w-screen-2xl mx-auto">
+      <Script id="article-json-ld" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify(articleJsonLd)}
+      </Script>
       <Link
         href="/blog"
         className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
@@ -61,7 +106,10 @@ export default async function PostPage({ params }: Props) {
             <p className="mt-6 text-base text-zinc-700 dark:text-zinc-300 leading-relaxed">
               {post.excerpt}
             </p>
-            <div className="mt-8">
+            <p className="mt-4 text-sm text-zinc-500">
+              This article was curated from an external source. Click below to read the full story.
+            </p>
+            <div className="mt-4">
               <a
                 href={post.sourceUrl}
                 target="_blank"

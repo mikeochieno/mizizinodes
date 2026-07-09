@@ -151,7 +151,7 @@ date: "${date}"
 tags: [${tagStr}]
 image: "${image}"
 excerpt: "${excerpt.replace(/"/g, '\\"')}"
-author: "AI Editor"
+author: "MiziziNodes Editorial"
 ---
 
 ${content}

@@ -168,10 +168,25 @@ function categorize(title: string): string {
   return "AI";
 }
 
+const AI_TAGS = [
+  "ai", "artificial intelligence", "llm", "gpt", "chatgpt", "openai", "claude",
+  "gemini", "llama", "mistral", "machine learning", "deep learning", "neural",
+  "transformer", "diffusion", "agent", "rag", "fine-tuning", "embedding",
+  "llms & foundation models", "ai agents & tools", "machine learning research",
+  "ai engineering", "ai ethics & policy", "computer vision & generative ai",
+  "nlp & speech", "ai industry & business",
+];
+
+function isAiPost(p: { title: string; tags: string[] }): boolean {
+  const text = (p.title + " " + p.tags.join(" ")).toLowerCase();
+  return AI_TAGS.some((t) => text.includes(t));
+}
+
 export async function getLocalPosts(): Promise<TrendingPost[]> {
   try {
     const posts = await getAllPosts();
     return posts
+      .filter(isAiPost)
       .map((p) => ({
         slug: p.slug,
         title: p.title,

@@ -17,7 +17,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800">
       <div className="px-8 h-14 flex items-center justify-between max-w-screen-2xl mx-auto">
         <Link href="/" className="text-lg font-bold tracking-tight text-black dark:text-white">
-          Blog
+          MiziziNodes
         </Link>
         <nav className="flex items-center gap-1">
           {links.map((link) => {

@@ -11,10 +11,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const postsDir = path.resolve(__dirname, "..", "content", "posts");
 
 const RSS_FEEDS = [
-  "https://trends.google.com/trending/rss?geo=US",
   "https://hnrss.org/frontpage",
-  "https://feeds.bbci.co.uk/news/rss.xml",
-  "https://www.espn.com/espn/rss/news",
+  "https://hnrss.org/newest?q=ai+OR+llm+OR+gpt+OR+neural+OR+transformer+OR+diffusion+OR+agent+OR+rag+OR+fine+tuning",
+  "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
+  "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+  "https://techcrunch.com/category/artificial-intelligence/feed/",
+  "https://www.artificialintelligence-news.com/feed/",
 ];
 
 const parser = new Parser();
@@ -46,6 +48,24 @@ const PROVIDERS = [
     apiKey: () => process.env.OPENCODE_API_KEY,
     model: "gpt-4o-mini",
   },
+  {
+    name: "DeepSeek",
+    type: "openai",
+    apiKey: () => process.env.DEEPSEEK_API_KEY,
+    baseURL: "https://api.deepseek.com",
+    model: "deepseek-chat",
+  },
+];
+
+const AI_CATEGORIES = [
+  "LLMs & Foundation Models",
+  "AI Agents & Tools",
+  "Machine Learning Research",
+  "AI Engineering",
+  "AI Ethics & Policy",
+  "Computer Vision & Generative AI",
+  "NLP & Speech",
+  "AI Industry & Business",
 ];
 
 function slugify(text) {
@@ -61,7 +81,7 @@ async function fetchTrending() {
   for (const url of RSS_FEEDS) {
     try {
       const feed = await parser.parseURL(url);
-      for (const item of feed.items.slice(0, 3)) {
+      for (const item of feed.items.slice(0, 4)) {
         if (item.title && item.link) {
           items.push({ title: item.title, link: item.link, source: feed.title });
         }
@@ -71,42 +91,57 @@ async function fetchTrending() {
   return items;
 }
 
-const CATEGORIES = [
-  "AI & Machine Learning",
-  "Software Development",
-  "Tech Industry",
-  "Science & Space",
-  "World News & Politics",
-  "Sports",
-  "Entertainment",
-  "Business & Finance",
-];
-
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+function pickCategory(title, source) {
+  const t = (title + " " + source).toLowerCase();
+  if (t.includes("agent") || t.includes("tool") || t.includes("autogpt") || t.includes("function call"))
+    return "AI Agents & Tools";
+  if (t.includes("llm") || t.includes("gpt") || t.includes("foundation model") || t.includes("claude") || t.includes("gemini") || t.includes("llama") || t.includes("mistral") || t.includes("transformer"))
+    return "LLMs & Foundation Models";
+  if (t.includes("ml") || t.includes("training") || t.includes("fine-tun") || t.includes("backprop") || t.includes("gradient") || t.includes("loss") || t.includes("dataset") || t.includes("reinforcement"))
+    return "Machine Learning Research";
+  if (t.includes("compute") || t.includes("vision") || t.includes("diffusion") || t.includes("generat") || t.includes("image") || t.includes("video") || t.includes("stable diffusion") || t.includes("sora"))
+    return "Computer Vision & Generative AI";
+  if (t.includes("nlp") || t.includes("speech") || t.includes("language model") || t.includes("translation") || t.includes("rag") || t.includes("embedding") || t.includes("semantic"))
+    return "NLP & Speech";
+  if (t.includes("ethic") || t.includes("safety") || t.includes("alignment") || t.includes("bias") || t.includes("regulation") || t.includes("policy") || t.includes("governance") || t.includes("open source"))
+    return "AI Ethics & Policy";
+  if (t.includes("engineer") || t.includes("deploy") || t.includes("infra") || t.includes("pipeline") || t.includes("mllm") || t.includes("optimiz") || t.includes("inference") || t.includes("serving"))
+    return "AI Engineering";
+  return "AI Industry & Business";
 }
 
-function buildPrompt(topic, assignedCategory) {
-  return `You are a tech journalist. Write a well-researched, engaging, original blog post about this trending topic:
+function buildPrompt(topic, category) {
+  return `You are a senior AI researcher and tech journalist. Write a deep, original analysis piece about this trending AI topic:
 
 "${topic.title}" (source: ${topic.source})
 
-Requirements:
-- Title: compelling headline
+This article must NOT be a shallow summary. It must deliver original analysis, comparisons, context, and insight. Follow these requirements:
+
+STRUCTURE & FORMAT:
+- Title: a compelling, specific headline (not generic)
 - Date: today's date (${new Date().toISOString().split("T")[0]})
-- Tags: 4-5 relevant tags including "${assignedCategory.toLowerCase()}" (comma separated, lowercase)
-- Author: AI Editor
-- Excerpt: 2-3 sentence summary that hooks the reader
-- Content: 600-1000 words, well-structured with paragraphs and subheadings (##), engaging tone, factual, feels like original journalism not a summary
-- IMAGE_PROMPT: a short search query (10-20 words) to find a relevant photo for this article on a stock image site — describe the scene/subject visually, e.g. "close up of a person typing code on a laptop" or "soccer player celebrating a goal in stadium"
+- Tags: 4-6 relevant tags including "${category.toLowerCase()}" (comma separated, lowercase)
+- Author: MiziziNodes Editorial
+- Excerpt: 2-3 sentence summary that hooks the reader and states the article's thesis
+- Content: 1000-1500 words — well-structured with an introduction, 3-5 subheadings (##), and a conclusion
+- IMAGE_PROMPT: a short search query (10-20 words) to find a relevant photo — describe the scene/subject visually
+
+CONTENT REQUIREMENTS (must include at least 3 of these):
+1. COMPARISON: Compare this development with previous approaches or competing solutions (e.g., Claude vs GPT vs Gemini, PyTorch vs JAX, etc.)
+2. CONTEXT: Explain why this matters — what problem does it solve, what's the broader trend?
+3. ANALYSIS: Give your own assessment — is this hype or real progress? What are the limitations?
+4. TECHNICAL DEPTH: Include at least one concrete technical detail (architecture choice, benchmark result, training method, API pattern, etc.)
+5. PRACTICAL IMPACT: How will this affect developers, researchers, or businesses?
+
+TONE & STYLE:
+- Analytical and insightful, not promotional
+- Cite specific examples, papers, or products
+- Acknowledge both strengths and weaknesses
+- Write in clear, engaging prose — aim for something between a blog post and a newsletter analysis
 
 Respond in this exact format:
 TITLE: <title>
-TAGS: <tag1, tag2, tag3, tag4>
+TAGS: <tag1, tag2, tag3, tag4, tag5>
 EXCERPT: <excerpt>
 IMAGE_PROMPT: <prompt>
 CONTENT:
@@ -121,7 +156,7 @@ function parseResponse(text) {
   const contentMatch = text.match(/CONTENT:\s*([\s\S]+)/);
   return {
     title: titleMatch?.[1]?.trim() || "",
-    tags: (tagsMatch?.[1]?.trim() || "tech").split(",").map((t) => t.trim().toLowerCase()),
+    tags: (tagsMatch?.[1]?.trim() || "ai").split(",").map((t) => t.trim().toLowerCase()),
     excerpt: excerptMatch?.[1]?.trim() || "",
     imagePrompt: imageMatch?.[1]?.trim() || "",
     content: contentMatch?.[1]?.trim() || "",
@@ -170,14 +205,12 @@ ${content}
 const IMG_DIR = path.resolve(__dirname, "..", "public", "images");
 
 async function searchImage(query, category) {
-  // tries Pexels → Unsplash, each with 2 queries (imagePrompt → category)
   const queries = [query, category].filter(Boolean);
 
   const pexelsKey = process.env.PEXELS_API_KEY;
   const unsplashKey = process.env.UNSPLASH_API_KEY;
 
   for (const q of queries) {
-    // try Pexels
     if (pexelsKey) {
       try {
         const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=1&orientation=landscape`;
@@ -194,7 +227,6 @@ async function searchImage(query, category) {
       }
     }
 
-    // try Unsplash
     if (unsplashKey) {
       try {
         const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(q)}&per_page=1&orientation=landscape`;
@@ -242,8 +274,8 @@ async function tryOpenAI(cfg, topic, category) {
   const response = await client.chat.completions.create({
     model: cfg.model,
     messages: [{ role: "user", content: buildPrompt(topic, category) }],
-    temperature: 0.7,
-    max_tokens: 2000,
+    temperature: 0.8,
+    max_tokens: 3500,
   });
 
   const text = response.choices[0]?.message?.content;
@@ -280,7 +312,7 @@ async function generateWithFallback(topic, category) {
   const available = PROVIDERS.filter((p) => p.apiKey());
 
   if (available.length === 0) {
-    throw new Error("No API keys configured. Set GEMINI_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY, or OPENCODE_API_KEY");
+    throw new Error("No API keys configured. Set GEMINI_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY, OPENCODE_API_KEY, or DEEPSEEK_API_KEY");
   }
 
   const errors = [];
@@ -306,7 +338,7 @@ async function generateWithFallback(topic, category) {
 }
 
 async function main() {
-  console.log("🔍 Fetching trending topics from RSS feeds...");
+  console.log("🔍 Fetching trending AI topics from RSS feeds...");
   const trending = await fetchTrending();
 
   if (trending.length === 0) {
@@ -315,16 +347,15 @@ async function main() {
   }
 
   const available = PROVIDERS.filter((p) => p.apiKey());
-  console.log(`📰 Found ${trending.length} topics`);
+  console.log(`📰 Found ${trending.length} AI topics`);
   console.log(`🔑 ${available.length} provider(s) configured: ${available.map((p) => p.name).join(", ") || "none"}`);
   console.log("");
 
-  shuffle(trending);
   const count = Math.min(parseInt(process.env.POST_COUNT || "2"), 5);
 
   for (let i = 0; i < count; i++) {
     const topic = trending[i % trending.length];
-    const category = CATEGORIES[i % CATEGORIES.length];
+    const category = pickCategory(topic.title, topic.source);
     console.log(`✍️  [${i + 1}/${count}] [${category}] "${topic.title}"`);
     try {
       await generateWithFallback(topic, category);

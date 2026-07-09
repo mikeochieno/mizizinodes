@@ -20,7 +20,7 @@ export default async function Home() {
     "@type": "WebSite",
     name: "MiziziNodes",
     url: siteUrl,
-    description: "Curated tech news, AI breakthroughs, developer tools, and original articles from across the web.",
+    description: "In-depth AI research, LLM comparisons, agent tutorials, and original analysis of the AI landscape.",
     potentialAction: {
       "@type": "SearchAction",
       target: `${siteUrl}/search?q={search_term_string}`,

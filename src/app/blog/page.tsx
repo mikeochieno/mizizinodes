@@ -6,7 +6,7 @@ import { AdSlot } from "@/components/AdSense";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "All blog posts — MiziziNodes",
+  description: "All AI research articles and analysis — MiziziNodes",
 };
 
 type Props = { searchParams: Promise<{ page?: string }> };

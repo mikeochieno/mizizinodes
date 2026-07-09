@@ -23,9 +23,10 @@ const parser: Parser<{ title: string }, FeedItem> = new Parser({
 
 const RSS_FEEDS = [
   "https://hnrss.org/frontpage",
-  "https://techcrunch.com/feed/",
-  "https://www.theverge.com/rss/index.xml",
-  "https://feeds.feedburner.com/TheNextWeb",
+  "https://hnrss.org/newest?q=ai+OR+llm+OR+gpt+OR+neural+OR+transformer+OR+diffusion+OR+agent+OR+rag+OR+fine+tuning",
+  "https://techcrunch.com/category/artificial-intelligence/feed/",
+  "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+  "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
 ];
 
 const CACHE_DURATION = 30 * 60 * 1000;
@@ -132,20 +133,17 @@ function categorize(title: string): string {
     t.includes("machine learning") ||
     t.includes("openai") ||
     t.includes("llm") ||
-    t.includes("neural")
+    t.includes("neural") ||
+    t.includes("agent") ||
+    t.includes("diffusion") ||
+    t.includes("gpt") ||
+    t.includes("gemini") ||
+    t.includes("claude") ||
+    t.includes("llama") ||
+    t.includes("transformer") ||
+    t.includes("deep learning")
   )
     return "AI";
-  if (
-    t.includes("world cup") ||
-    t.includes("soccer") ||
-    t.includes("football") ||
-    t.includes("nfl") ||
-    t.includes("nba") ||
-    t.includes("espn") ||
-    t.includes("champions") ||
-    t.includes("olympic")
-  )
-    return "Sports";
   if (
     t.includes("apple") ||
     t.includes("google") ||
@@ -167,32 +165,7 @@ function categorize(title: string): string {
     t.includes("software")
   )
     return "Dev";
-  if (
-    t.includes("design") ||
-    t.includes("ui") ||
-    t.includes("ux") ||
-    t.includes("interface")
-  )
-    return "Design";
-  if (
-    t.includes("stock") ||
-    t.includes("market") ||
-    t.includes("finance") ||
-    t.includes("bank") ||
-    t.includes("economy") ||
-    t.includes("ipo")
-  )
-    return "Business";
-  if (
-    t.includes("film") ||
-    t.includes("movie") ||
-    t.includes("music") ||
-    t.includes("game") ||
-    t.includes("celebrity") ||
-    t.includes("hollywood")
-  )
-    return "Entertainment";
-  return "News";
+  return "AI";
 }
 
 export async function getLocalPosts(): Promise<TrendingPost[]> {
@@ -223,66 +196,66 @@ function getFallback(): TrendingPost[] {
       title: "AI Breakthrough: New Models Achieve Human-Level Reasoning",
       date: today,
       excerpt:
-        "Recent advances in artificial intelligence have led to models that can perform complex reasoning tasks at human levels, marking a significant milestone in the field. Researchers demonstrated unprecedented performance on benchmarks testing logic, mathematics, and common sense.",
+        "Recent advances in artificial intelligence have led to models that can perform complex reasoning tasks at human levels, marking a significant milestone in the field.",
       source: "TechCrunch",
       sourceUrl: "#",
       category: "AI",
       image: "https://picsum.photos/seed/aibreakthrough/800/450",
     },
     {
-      slug: "apple-vision-pro-update",
-      title: "Apple Vision Pro Gets Major Software Update with New Features",
+      slug: "open-source-llm-benchmarks",
+      title: "Open Source LLMs Close the Gap: Benchmark Showdown 2024",
       date: today,
       excerpt:
-        "Apple announced a significant software update for Vision Pro, bringing spatial Personas, improved productivity features, and new entertainment experiences. The update includes better hand tracking and virtual display expansion.",
+        "Open source language models are matching proprietary alternatives on key benchmarks. We analyze the latest results from Llama, Mistral, and Qwen across reasoning, coding, and multilingual tasks.",
       source: "The Verge",
       sourceUrl: "#",
-      category: "Tech",
-      image: "https://picsum.photos/seed/applevision/800/450",
+      category: "AI",
+      image: "https://picsum.photos/seed/opensourcellm/800/450",
     },
     {
-      slug: "react-19-new-features",
-      title: "React 19: What Developers Need to Know About the Latest Release",
+      slug: "ai-agents-production",
+      title: "Building Reliable AI Agents: Lessons from Production Deployments",
       date: today,
       excerpt:
-        "React 19 introduces groundbreaking features including server components, improved suspense handling, and a new compiler that promises significant performance gains for production applications.",
-      source: "TechCrunch",
-      sourceUrl: "#",
-      category: "Dev",
-      image: "https://picsum.photos/seed/react19/800/450",
-    },
-    {
-      slug: "typescript-5-6-arrives",
-      title: "TypeScript 5.6 Arrives with Smarter Type Inference and Better DX",
-      date: today,
-      excerpt:
-        "Microsoft releases TypeScript 5.6 with improved type narrowing, better discriminated unions, and performance optimizations for large codebases. The update also includes a new --isolatedDeclarations flag.",
-      source: "The Next Web",
-      sourceUrl: "#",
-      category: "Dev",
-      image: "https://picsum.photos/seed/typescript56/800/450",
-    },
-    {
-      slug: "google-gemini-expands",
-      title: "Google Gemini Expands to More Countries with New Features",
-      date: today,
-      excerpt:
-        "Google's Gemini AI assistant is rolling out to additional markets, bringing multilingual support and enhanced integration with Workspace apps. Users can now access Gemini directly from Gmail and Docs.",
+        "Companies deploying AI agents in production share patterns for handling hallucinations, tool use failures, and multi-step reasoning. A practical guide to agent architectures that work.",
       source: "TechCrunch",
       sourceUrl: "#",
       category: "AI",
-      image: "https://picsum.photos/seed/gemini/800/450",
+      image: "https://picsum.photos/seed/aiagents/800/450",
     },
     {
-      slug: "future-of-css-layouts",
-      title: "The Future of CSS Layouts: Anchor Positioning and More",
+      slug: "rag-patterns-2024",
+      title: "RAG in Practice: Advanced Retrieval Patterns Beyond Naive Chunking",
       date: today,
       excerpt:
-        "New CSS features like anchor positioning, scroll-driven animations, and container queries are changing how developers approach web layouts. Browser support is expanding rapidly across all major engines.",
+        "Retrieval-Augmented Generation has evolved beyond basic chunk-and-embed. We explore reranking, hybrid search, agentic RAG, and the latest research on improving retrieval quality.",
+      source: "AI News",
+      sourceUrl: "#",
+      category: "AI",
+      image: "https://picsum.photos/seed/ragpatterns/800/450",
+    },
+    {
+      slug: "nvidia-blackwell-ai",
+      title: "NVIDIA Blackwell: What the Next-Gen Architecture Means for AI Workloads",
+      date: today,
+      excerpt:
+        "NVIDIA's Blackwell architecture promises a leap in AI training and inference performance. We break down the specs, the benchmarks, and what it means for the AI industry.",
+      source: "TechCrunch",
+      sourceUrl: "#",
+      category: "Tech",
+      image: "https://picsum.photos/seed/nvidiablackwell/800/450",
+    },
+    {
+      slug: "multimodal-models-comparison",
+      title: "Multimodal Models Compared: GPT-4V, Gemini, Claude, and Open Source Alternatives",
+      date: today,
+      excerpt:
+        "A head-to-head comparison of leading multimodal models across vision, language, and reasoning tasks. We test real-world scenarios including document analysis, image understanding, and video comprehension.",
       source: "The Verge",
       sourceUrl: "#",
-      category: "Design",
-      image: "https://picsum.photos/seed/csslayouts/800/450",
+      category: "AI",
+      image: "https://picsum.photos/seed/multimodal/800/450",
     },
   ];
 }

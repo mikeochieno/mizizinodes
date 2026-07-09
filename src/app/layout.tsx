@@ -21,10 +21,10 @@ const siteUrl = process.env.SITE_URL || "https://mizizinodes.vercel.app";
 
 export const metadata: Metadata = {
   title: {
-    default: "MiziziNodes — Tech News & Insights",
+    default: "MiziziNodes — AI Research & Analysis",
     template: "%s — MiziziNodes",
   },
-  description: "Curated tech news, AI breakthroughs, developer tools, and original articles from across the web.",
+  description: "In-depth AI research, LLM comparisons, agent tutorials, and original analysis of the AI landscape.",
   metadataBase: new URL(siteUrl),
   alternates: {
     types: {
@@ -34,15 +34,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "MiziziNodes",
-    title: "MiziziNodes — Tech News & Insights",
-    description: "Curated tech news, AI breakthroughs, developer tools, and original articles from across the web.",
+    title: "MiziziNodes — AI Research & Analysis",
+    description: "In-depth AI research, LLM comparisons, agent tutorials, and original analysis of the AI landscape.",
     url: siteUrl,
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: "MiziziNodes",
-    description: "Curated tech news, AI breakthroughs, developer tools, and original articles.",
+    description: "In-depth AI research, LLM comparisons, agent tutorials, and original analysis.",
   },
   robots: {
     index: true,

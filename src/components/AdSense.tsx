@@ -14,10 +14,9 @@ const adClient = process.env.NEXT_PUBLIC_ADSENSE_ID || "";
 export function AdSenseScript() {
   if (!adClient) return null;
   return (
-    <Script
-      id="adsense"
+    <script
+      async
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adClient}`}
-      strategy="afterInteractive"
       crossOrigin="anonymous"
     />
   );

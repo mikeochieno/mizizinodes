@@ -77,7 +77,7 @@ export default async function PostPage({ params }: Props) {
   const shareText = encodeURIComponent(post.title);
 
   return (
-    <div className="px-8 py-8 max-w-screen-2xl mx-auto">
+    <div className="px-8 py-8 max-w-4xl mx-auto">
       <Script id="article-json-ld" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify(articleJsonLd)}
       </Script>
@@ -108,44 +108,40 @@ export default async function PostPage({ params }: Props) {
         )}
       </div>
 
-      <h1 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight max-w-4xl">
+      <h1 className="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
         {post.title}
       </h1>
 
       {post.image && (
-        <img src={post.image} alt={post.title} className="mt-6 w-full rounded-xl object-cover aspect-video max-w-4xl" />
+        <img src={post.image} alt={post.title} className="mt-6 w-full rounded-xl object-cover aspect-video" />
       )}
 
       <div className="mt-8 flex gap-10">
         <ShareSidebar url={shareUrl} title={post.title} />
 
-        {/* Main content + TOC */}
-        <div className="min-w-0 flex-1 max-w-3xl">
+        <div className="min-w-0 flex-1">
           {localPost ? (
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col gap-8">
               {headings.length > 1 && (
-                <aside className="lg:w-56 shrink-0 order-first">
-                  <div className="lg:sticky lg:top-20">
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">
-                      In this article
-                    </h4>
-                    <nav className="space-y-1.5">
-                      {headings.map((h) => (
-                        <a
-                          key={h.id}
-                          href={`#${h.id}`}
-                          className="block text-sm text-zinc-500 hover:text-black dark:hover:text-white transition-colors leading-snug"
-                          style={{ paddingLeft: `${(h.level - 2) * 12}px` }}
-                        >
-                          {h.text}
-                        </a>
-                      ))}
-                    </nav>
-                  </div>
-                </aside>
+                <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">
+                    In this article
+                  </h4>
+                  <nav className="flex flex-wrap gap-x-4 gap-y-1">
+                    {headings.map((h) => (
+                      <a
+                        key={h.id}
+                        href={`#${h.id}`}
+                        className="text-sm text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
+                      >
+                        {h.text}
+                      </a>
+                    ))}
+                  </nav>
+                </div>
               )}
               <div
-                className="prose prose-zinc dark:prose-invert max-w-none min-w-0 flex-1"
+                className="prose prose-zinc dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: mdToHtml(localPost.content) }}
               />
             </div>

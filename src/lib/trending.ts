@@ -177,9 +177,28 @@ const AI_TAGS = [
   "nlp & speech", "ai industry & business",
 ];
 
+const NON_AI_TITLE_KEYWORDS = [
+  "sport", "soccer", "football", "nba", "nfl", "olympic", "tennis", "cricket",
+  "election", "politics", "politician", "vote", "president", "congress", "senate",
+  "war", "military", "army", "weapon", "conflict", "attack", "terror",
+  "murder", "crime", "criminal", "fugitive", "suspect", "police", "arrest",
+  "movie", "film", "actor", "actress", "celebrity", "music", "album", "song",
+  "game", "gaming", "playoff", "championship", "tournament",
+  "weather", "hurricane", "storm", "earthquake", "flood",
+  "healthcare", "hospital", "disease", "cancer", "vaccine",
+  "burnham", "labour", "conservative", "tory", "democrat", "republican",
+  "nba", "espn", "bbc sport", "sky sport",
+];
+
 function isAiPost(p: { title: string; tags: string[] }): boolean {
-  const text = (p.title + " " + p.tags.join(" ")).toLowerCase();
-  return AI_TAGS.some((t) => text.includes(t));
+  const title = p.title.toLowerCase();
+  const tagText = p.tags.join(" ").toLowerCase();
+
+  // exclude if title has non-AI keywords
+  if (NON_AI_TITLE_KEYWORDS.some((kw) => title.includes(kw))) return false;
+
+  // include if tags or title reference AI
+  return AI_TAGS.some((t) => title.includes(t) || tagText.includes(t));
 }
 
 export async function getLocalPosts(): Promise<TrendingPost[]> {

@@ -13,6 +13,7 @@ import NextArticle from "@/components/NextArticle";
 import NewsletterForm from "@/components/NewsletterForm";
 import GiscusComments from "@/components/GiscusComments";
 import BackToTop from "@/components/BackToTop";
+import TopicClusters from "@/components/TopicClusters";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -224,6 +225,8 @@ export default async function PostPage({ params }: Props) {
       </div>
 
       <BackToTop />
+
+      <TopicClusters currentSlug={slug} tags={tags} />
 
       {related.length > 0 && (
         <section className="mt-16 pt-10 border-t border-zinc-200 dark:border-zinc-800">

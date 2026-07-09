@@ -11,12 +11,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const postsDir = path.resolve(__dirname, "..", "content", "posts");
 
 const RSS_FEEDS = [
-  "https://hnrss.org/frontpage",
-  "https://hnrss.org/newest?q=ai+OR+llm+OR+gpt+OR+neural+OR+transformer+OR+diffusion+OR+agent+OR+rag+OR+fine+tuning",
+  "https://hnrss.org/frontpage?q=ai+OR+llm+OR+gpt+OR+neural+OR+transformer+OR+diffusion+OR+agent+OR+rag+OR+fine+tuning+OR+openai+OR+claude+OR+gemini+OR+llama+OR+mistral+OR+deep+learning+OR+machine+learning+OR+generative",
   "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
   "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
   "https://techcrunch.com/category/artificial-intelligence/feed/",
   "https://www.artificialintelligence-news.com/feed/",
+  "https://hnrss.org/frontpage",
 ];
 
 const parser = new Parser();
@@ -76,13 +76,36 @@ function slugify(text) {
     .slice(0, 60);
 }
 
+const AI_KEYWORDS = [
+  "ai", "artificial intelligence", "llm", "gpt", "chatgpt", "openai", "claude", "anthropic",
+  "gemini", "deepmind", "llama", "mistral", "stable diffusion", "midjourney", "sora",
+  "neural", "deep learning", "machine learning", "transformer", "diffusion",
+  "agent", "rag", "fine.tun", "embedding", "vector database", "langchain",
+  "copilot", "github copilot", "cursor", "windsurf", "bolt.new",
+  "nvidia", "blackwell", "h100", "h200", "b200", "tpu", "training",
+  "reasoning", "multimodal", "frontier model", "foundation model",
+  "inference", "open source model", "weight", "checkpoint",
+  "ml", "gen ai", "generative ai", "compute", "data center",
+  "gpu", "vllm", "triton", "pytorch", "tensorflow", "jax",
+  "hugging face", "cuda", "cann", "rocm", "oneapi",
+  "quantization", "pruning", "distillation", "speculative decoding",
+  "moe", "mixture of experts", "attention", "context window",
+  "grok", "x.ai", "xai", "perplexity", "notebooklm",
+  "elon musk ai", "meta ai", "apple intelligence",
+];
+
+function isAiRelated(title, source) {
+  const t = title.toLowerCase() + " " + source.toLowerCase();
+  return AI_KEYWORDS.some((kw) => t.includes(kw.toLowerCase()));
+}
+
 async function fetchTrending() {
   const items = [];
   for (const url of RSS_FEEDS) {
     try {
       const feed = await parser.parseURL(url);
-      for (const item of feed.items.slice(0, 4)) {
-        if (item.title && item.link) {
+      for (const item of feed.items.slice(0, 6)) {
+        if (item.title && item.link && isAiRelated(item.title, feed.title || "")) {
           items.push({ title: item.title, link: item.link, source: feed.title });
         }
       }

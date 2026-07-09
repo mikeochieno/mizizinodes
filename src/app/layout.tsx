@@ -88,19 +88,15 @@ export default function RootLayout({
           `}
         </Script>
         <AdSenseScript />
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
-              `}
-            </Script>
-          </>
-        )}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-CYN1EK2RBS" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-CYN1EK2RBS');
+          `}
+        </Script>
         {process.env.NEXT_PUBLIC_GSC_ID && (
           <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GSC_ID} />
         )}

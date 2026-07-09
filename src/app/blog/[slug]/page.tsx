@@ -77,7 +77,7 @@ export default async function PostPage({ params }: Props) {
   const shareText = encodeURIComponent(post.title);
 
   return (
-    <div className="px-8 py-8 max-w-4xl mx-auto">
+    <div className="px-8 py-8 max-w-7xl mx-auto">
       <Script id="article-json-ld" type="application/ld+json" strategy="afterInteractive">
         {JSON.stringify(articleJsonLd)}
       </Script>
@@ -116,7 +116,7 @@ export default async function PostPage({ params }: Props) {
         <img src={post.image} alt={post.title} className="mt-6 w-full rounded-xl object-cover aspect-video" />
       )}
 
-      <div className="mt-8 flex gap-10">
+      <div className="mt-8 flex gap-10 justify-center">
         <ShareSidebar url={shareUrl} title={post.title} />
 
         <div className="min-w-0 flex-1">

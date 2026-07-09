@@ -163,3 +163,43 @@ body {
 .dark ::selection {
   background: #60a5fa80;
 }
+
+/* Code syntax highlighting */
+.prose pre code {
+  display: block;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+}
+
+.prose pre code .keyword { color: #2563eb; }
+.prose pre code .string { color: #16a34a; }
+.prose pre code .comment { color: #71717a; font-style: italic; }
+.prose pre code .function { color: #9333ea; }
+.prose pre code .number { color: #d97706; }
+.prose pre code .operator { color: #dc2626; }
+
+.dark .prose pre code .keyword { color: #60a5fa; }
+.dark .prose pre code .string { color: #4ade80; }
+.dark .prose pre code .comment { color: #52525b; }
+.dark .prose pre code .function { color: #a78bfa; }
+.dark .prose pre code .number { color: #fbbf24; }
+.dark .prose pre code .operator { color: #f87171; }
+
+/* Smooth dark mode transition */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* Scale-up animation for lightbox */
+@keyframes scale-up {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-up {
+  animation: scale-up 0.2s ease-out;
+}

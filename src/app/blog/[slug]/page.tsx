@@ -6,6 +6,13 @@ import { getPostBySlug, getTrendingPosts, getLocalPosts } from "@/lib/trending";
 import { getPost, getRelatedPosts, extractHeadings } from "@/lib/posts";
 import { ShareButtons, ShareSidebar } from "@/components/ShareButtons";
 import ProgressBar from "@/components/ProgressBar";
+import ImageLightbox from "@/components/ImageLightbox";
+import TextToSpeech from "@/components/TextToSpeech";
+import ArticleSummary from "@/components/ArticleSummary";
+import NextArticle from "@/components/NextArticle";
+import NewsletterForm from "@/components/NewsletterForm";
+import GiscusComments from "@/components/GiscusComments";
+import BackToTop from "@/components/BackToTop";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -113,7 +120,7 @@ export default async function PostPage({ params }: Props) {
       </h1>
 
       {post.image && (
-        <img src={post.image} alt={post.title} className="mt-6 w-full rounded-xl object-cover aspect-video" />
+        <ImageLightbox src={post.image} alt={post.title} className="w-full rounded-xl object-cover aspect-video" />
       )}
 
       <div className="mt-8 flex gap-10 justify-center">
@@ -122,6 +129,12 @@ export default async function PostPage({ params }: Props) {
         <div className="min-w-0 flex-1">
           {localPost ? (
             <div className="flex flex-col gap-8">
+              <div className="flex items-center gap-2">
+                <TextToSpeech text={localPost.content} />
+              </div>
+
+              <ArticleSummary content={localPost.content} />
+
               {headings.length > 1 && (
                 <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">
@@ -144,6 +157,8 @@ export default async function PostPage({ params }: Props) {
                 className="prose prose-zinc dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: mdToHtml(localPost.content) }}
               />
+
+              <NextArticle currentSlug={slug} tags={tags} />
             </div>
           ) : (
             <>
@@ -199,10 +214,16 @@ export default async function PostPage({ params }: Props) {
           <div className="mt-6 flex lg:hidden">
             <ShareButtons url={shareUrl} title={post.title} />
           </div>
+
+          <div className="mt-10 space-y-6">
+            <NewsletterForm />
+          </div>
+
+          <GiscusComments slug={slug} />
         </div>
       </div>
 
-
+      <BackToTop />
 
       {related.length > 0 && (
         <section className="mt-16 pt-10 border-t border-zinc-200 dark:border-zinc-800">

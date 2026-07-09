@@ -145,22 +145,25 @@ STRUCTURE & FORMAT:
 - Date: today's date (${new Date().toISOString().split("T")[0]})
 - Tags: 4-6 relevant tags including "${category.toLowerCase()}" (comma separated, lowercase)
 - Author: MiziziNodes Editorial
-- Excerpt: 2-3 sentence summary that hooks the reader and states the article's thesis
-- Content: 1000-1500 words — well-structured with an introduction, 3-5 subheadings (##), and a conclusion
+- Excerpt: 2-3 sentence summary that hooks the reader and states the article's thesis — make it specific, not generic
+- Content: 1500-2000 words — well-structured with an introduction, 4-6 subheadings (##), and a conclusion
+- Use concrete examples, specific numbers, benchmark results, and named products/papers where possible
 - IMAGE_PROMPT: a short search query (10-20 words) to find a relevant photo — describe the scene/subject visually
 
-CONTENT REQUIREMENTS (must include at least 3 of these):
-1. COMPARISON: Compare this development with previous approaches or competing solutions (e.g., Claude vs GPT vs Gemini, PyTorch vs JAX, etc.)
-2. CONTEXT: Explain why this matters — what problem does it solve, what's the broader trend?
-3. ANALYSIS: Give your own assessment — is this hype or real progress? What are the limitations?
-4. TECHNICAL DEPTH: Include at least one concrete technical detail (architecture choice, benchmark result, training method, API pattern, etc.)
-5. PRACTICAL IMPACT: How will this affect developers, researchers, or businesses?
+CONTENT REQUIREMENTS (must include ALL of these):
+1. COMPARISON: Compare this development with previous approaches or competing solutions (e.g., Claude vs GPT vs Gemini, PyTorch vs JAX, etc.) — use specific version numbers and benchmarks
+2. CONTEXT: Explain why this matters — what problem does it solve, what's the broader trend? Include relevant history
+3. CRITICAL ANALYSIS: Give your own assessment — what are the real limitations, trade-offs, or open questions? Don't just hype it
+4. TECHNICAL DEPTH: Include at least 2-3 concrete technical details (architecture choice, benchmark numbers, training method, API patterns, performance metrics, etc.)
+5. PRACTICAL IMPACT: How will this affect developers, researchers, or businesses? Give specific use cases
+6. FUTURE OUTLOOK: What's next? What questions remain unanswered?
 
 TONE & STYLE:
 - Analytical and insightful, not promotional
-- Cite specific examples, papers, or products
 - Acknowledge both strengths and weaknesses
-- Write in clear, engaging prose — aim for something between a blog post and a newsletter analysis
+- Write in clear, engaging prose — aim for something between a Stratechery analysis and a Lilian Weng blog post
+- Include at least one direct comparison table or numbered list of key differences
+- Each section should have a clear argument, not just descriptive text
 
 Respond in this exact format:
 TITLE: <title>
@@ -298,7 +301,7 @@ async function tryOpenAI(cfg, topic, category) {
     model: cfg.model,
     messages: [{ role: "user", content: buildPrompt(topic, category) }],
     temperature: 0.8,
-    max_tokens: 3500,
+    max_tokens: 5000,
   });
 
   const text = response.choices[0]?.message?.content;

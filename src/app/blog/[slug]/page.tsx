@@ -4,6 +4,7 @@ import Script from "next/script";
 import Link from "next/link";
 import { getPostBySlug, getTrendingPosts, getLocalPosts } from "@/lib/trending";
 import { getPost, getRelatedPosts, extractHeadings } from "@/lib/posts";
+import { fetchArticleContent } from "@/lib/extractArticle";
 import { ShareButtons, ShareSidebar } from "@/components/ShareButtons";
 import ProgressBar from "@/components/ProgressBar";
 import ImageLightbox from "@/components/ImageLightbox";
@@ -55,7 +56,14 @@ export default async function PostPage({ params }: Props) {
 
   const localPost = post.sourceUrl.startsWith("/blog/") ? await getPost(slug) : null;
 
-  const headings = localPost ? extractHeadings(localPost.content) : [];
+  const externalContent =
+    !localPost && post.sourceUrl.startsWith("http") ? await fetchArticleContent(post.sourceUrl) : null;
+
+  const headings = localPost
+    ? extractHeadings(localPost.content)
+    : externalContent
+      ? extractHtmlHeadings(externalContent.html)
+      : [];
   const related = localPost ? await getRelatedPosts(slug, localPost.meta.tags, 4) : [];
   const tags = localPost?.meta.tags || [];
 
@@ -161,6 +169,51 @@ export default async function PostPage({ params }: Props) {
 
               <NextArticle currentSlug={slug} tags={tags} />
             </div>
+          ) : externalContent ? (
+            <div className="flex flex-col gap-8">
+              <div className="flex items-center gap-2">
+                <TextToSpeech text={externalContent.text} />
+              </div>
+
+              {headings.length > 1 && (
+                <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">
+                    In this article
+                  </h4>
+                  <nav className="flex flex-wrap gap-x-4 gap-y-1">
+                    {headings.map((h) => (
+                      <a
+                        key={h.id}
+                        href={`#${h.id}`}
+                        className="text-sm text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
+                      >
+                        {h.text}
+                      </a>
+                    ))}
+                  </nav>
+                </div>
+              )}
+
+              <div
+                className="prose prose-zinc dark:prose-invert max-w-none"
+                dangerouslySetInnerHTML={{ __html: externalContent.html }}
+              />
+
+              <p className="text-sm text-zinc-500">
+                This article was originally published at{" "}
+                <a
+                  href={post.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 underline"
+                >
+                  {post.source}
+                </a>
+                .
+              </p>
+
+              <NextArticle currentSlug={slug} tags={tags} />
+            </div>
           ) : (
             <>
               <p className="text-base text-zinc-700 dark:text-zinc-300 leading-relaxed">
@@ -261,6 +314,19 @@ export default async function PostPage({ params }: Props) {
 
 function htmlEscape(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function extractHtmlHeadings(html: string): { id: string; text: string }[] {
+  const headings: { id: string; text: string }[] = [];
+  const re = /<h([2-3])([^>]*)>([\s\S]*?)<\/h\1>/gi;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(html)) !== null) {
+    const idMatch = match[2].match(/id=["']([^"']*)["']/);
+    const text = match[3].replace(/<[^>]+>/g, "").trim();
+    const id = idMatch?.[1] || text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    if (text && id) headings.push({ id, text });
+  }
+  return headings;
 }
 
 function highlightCode(code: string, lang: string): string {

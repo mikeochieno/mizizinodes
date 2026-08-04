@@ -98,9 +98,17 @@ const CAR_KEYWORDS = [
   "car news", "automotive", "motor", "drive", "driving", "road test",
 ];
 
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function wordBoundary(kw) {
+  return new RegExp(`(^|[^a-z0-9])${escapeRegExp(kw.toLowerCase())}([^a-z0-9]|$)`);
+}
+
 function isCarRelated(title, source) {
   const t = title.toLowerCase() + " " + source.toLowerCase();
-  return CAR_KEYWORDS.some((kw) => t.includes(kw.toLowerCase()));
+  return CAR_KEYWORDS.some((kw) => wordBoundary(kw).test(t));
 }
 
 async function fetchTrending() {
@@ -120,19 +128,20 @@ async function fetchTrending() {
 
 function pickCategory(title, source) {
   const t = (title + " " + source).toLowerCase();
-  if (t.includes("electric") || t.includes("ev") || t.includes("battery") || t.includes("charger") || t.includes("tesla") || t.includes("range"))
+  const has = (kw) => wordBoundary(kw).test(t);
+  if (has("electric") || has("ev") || has("battery") || has("charger") || has("tesla") || has("range"))
     return "Electric Vehicles";
-  if (t.includes("sports car") || t.includes("supercar") || t.includes("ferrari") || t.includes("lamborghini") || t.includes("mclaren") || t.includes("porsche") || t.includes("0-60") || t.includes("top speed"))
+  if (has("sports car") || has("supercar") || has("ferrari") || has("lamborghini") || has("mclaren") || has("porsche") || has("0-60") || has("top speed"))
     return "Sports Cars & Supercars";
-  if (t.includes("truck") || t.includes("pickup") || t.includes("off-road") || t.includes("towing") || t.includes("payload") || t.includes("4wd") || t.includes("overland"))
+  if (has("truck") || has("pickup") || has("off-road") || has("towing") || has("payload") || has("4wd") || has("overland"))
     return "Trucks & Off-Road";
-  if (t.includes("suv") || t.includes("crossover") || t.includes("minivan"))
+  if (has("suv") || has("crossover") || has("minivan"))
     return "SUVs & Crossovers";
-  if (t.includes("luxury") || t.includes("bmw") || t.includes("mercedes") || t.includes("audi") || t.includes("lexus") || t.includes("genesis"))
+  if (has("luxury") || has("bmw") || has("mercedes") || has("audi") || has("lexus") || has("genesis"))
     return "Luxury & Performance";
-  if (t.includes("sedan") || t.includes("coupe") || t.includes("hatchback") || t.includes("wagon"))
+  if (has("sedan") || has("coupe") || has("hatchback") || has("wagon"))
     return "Sedans & Coupes";
-  if (t.includes("concept") || t.includes("design") || t.includes("prototype") || t.includes("styling"))
+  if (has("concept") || has("design") || has("prototype") || has("styling"))
     return "Concepts & Design";
   return "Automotive Industry";
 }

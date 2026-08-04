@@ -76,7 +76,7 @@ export async function getTrendingPosts(): Promise<TrendingPost[]> {
         const feed = await parser.parseURL(feedUrl);
         for (const item of feed.items.slice(0, 4)) {
           if (item.title && item.link) {
-            const slug = slugify(item.title) + "-" + Math.random().toString(36).slice(2, 6);
+            const slug = slugify(item.title);
             const img = extractImage(item);
             all.push({
               slug,
@@ -212,13 +212,22 @@ const NON_CAR_TITLE_KEYWORDS = [
   "ai", "llm", "chatgpt", "openai", "gpt", "machine learning",
 ];
 
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function wordBoundary(kw: string): RegExp {
+  return new RegExp(`(^|[^a-z0-9])${escapeRegExp(kw.toLowerCase())}([^a-z0-9]|$)`);
+}
+
 function isCarPost(p: { title: string; tags: string[] }): boolean {
   const title = p.title.toLowerCase();
   const tagText = p.tags.join(" ").toLowerCase();
+  const combined = title + " " + tagText;
 
-  if (NON_CAR_TITLE_KEYWORDS.some((kw) => title.includes(kw))) return false;
+  if (NON_CAR_TITLE_KEYWORDS.some((kw) => wordBoundary(kw).test(combined))) return false;
 
-  return CAR_TAGS.some((t) => title.includes(t) || tagText.includes(t));
+  return CAR_TAGS.some((kw) => wordBoundary(kw).test(combined));
 }
 
 export async function getLocalPosts(): Promise<TrendingPost[]> {

@@ -4,7 +4,7 @@ import "./globals.css";
 import Script from "next/script";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { AdSenseScript } from "@/components/AdSense";
+// import { AdSenseScript } from "@/components/AdSense";
 import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
@@ -88,8 +88,8 @@ export default function RootLayout({
             })();
           `}
         </Script>
-        <AdSenseScript />
-        <script src="https://quge5.com/88/tag.min.js" data-zone="258067" async data-cfasync="false"></script>
+        {/* <AdSenseScript /> */}
+        {/* <script src="https://quge5.com/88/tag.min.js" data-zone="258067" async data-cfasync="false"></script> */}
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-CYN1EK2RBS" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`

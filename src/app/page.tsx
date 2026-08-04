@@ -2,7 +2,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { getTrendingPosts, getLocalPosts } from "@/lib/trending";
 import type { TrendingPost } from "@/lib/trending";
-import { AdSlot } from "@/components/AdSense";
+// import { AdSlot } from "@/components/AdSense";
 
 const siteUrl = process.env.SITE_URL || "https://mizizinodes.vercel.app";
 
@@ -46,7 +46,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <AdSlot slot="9200777134" className="my-8" />
+      {/* <AdSlot slot="9200777134" className="my-8" /> */}
 
       <section className="mt-12 pt-10 border-t border-zinc-200 dark:border-zinc-800">
         <SectionHeader title="Latest Stories" href="/blog" />

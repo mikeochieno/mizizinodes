@@ -52,7 +52,7 @@ jobs:
             echo "No new posts to commit"
             exit 0
           fi
-          git commit -m "Auto-generate blog posts [skip ci]"
+          git commit -m "Auto-generate car blog posts [skip ci]"
           git push origin main
 
       - name: Trigger Vercel redeploy

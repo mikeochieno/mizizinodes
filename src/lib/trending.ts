@@ -22,11 +22,13 @@ const parser: Parser<{ title: string }, FeedItem> = new Parser({
 });
 
 const RSS_FEEDS = [
-  "https://hnrss.org/frontpage",
-  "https://hnrss.org/newest?q=ai+OR+llm+OR+gpt+OR+neural+OR+transformer+OR+diffusion+OR+agent+OR+rag+OR+fine+tuning",
-  "https://techcrunch.com/category/artificial-intelligence/feed/",
-  "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
-  "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
+  "https://www.caranddriver.com/rss/all/",
+  "https://www.motortrend.com/feed/",
+  "https://www.autoblog.com/rss.xml",
+  "https://www.topgear.com/rss",
+  "https://www.edmunds.com/rss/news/",
+  "https://www.jalopnik.com/rss",
+  "https://www.thedrive.com/feed",
 ];
 
 const CACHE_DURATION = 30 * 60 * 1000;
@@ -128,84 +130,102 @@ function slugify(text: string): string {
 function categorize(title: string): string {
   const t = title.toLowerCase();
   if (
-    t.includes("ai") ||
-    t.includes("chatgpt") ||
-    t.includes("machine learning") ||
-    t.includes("openai") ||
-    t.includes("llm") ||
-    t.includes("neural") ||
-    t.includes("agent") ||
-    t.includes("diffusion") ||
-    t.includes("gpt") ||
-    t.includes("gemini") ||
-    t.includes("claude") ||
-    t.includes("llama") ||
-    t.includes("transformer") ||
-    t.includes("deep learning")
-  )
-    return "AI";
-  if (
-    t.includes("apple") ||
-    t.includes("google") ||
-    t.includes("microsoft") ||
-    t.includes("meta") ||
+    t.includes("electric") ||
+    t.includes(" ev") ||
+    t.includes("battery") ||
+    t.includes("charger") ||
     t.includes("tesla") ||
-    t.includes("amazon") ||
-    t.includes("nvidia")
+    t.includes("range") ||
+    t.includes("volt")
   )
-    return "Tech";
+    return "Electric Vehicles";
   if (
-    t.includes("react") ||
-    t.includes("javascript") ||
-    t.includes("python") ||
-    t.includes("code") ||
-    t.includes("css") ||
-    t.includes("typescript") ||
-    t.includes("developer") ||
-    t.includes("software")
+    t.includes("sports car") ||
+    t.includes("supercar") ||
+    t.includes("ferrari") ||
+    t.includes("lamborghini") ||
+    t.includes("mclaren") ||
+    t.includes("porsche") ||
+    t.includes("0-60") ||
+    t.includes("top speed")
   )
-    return "Dev";
-  return "AI";
+    return "Sports Cars & Supercars";
+  if (
+    t.includes("truck") ||
+    t.includes("pickup") ||
+    t.includes("off-road") ||
+    t.includes("towing") ||
+    t.includes("4wd") ||
+    t.includes("overland")
+  )
+    return "Trucks & Off-Road";
+  if (
+    t.includes("suv") ||
+    t.includes("crossover") ||
+    t.includes("minivan")
+  )
+    return "SUVs & Crossovers";
+  if (
+    t.includes("luxury") ||
+    t.includes("bmw") ||
+    t.includes("mercedes") ||
+    t.includes("audi") ||
+    t.includes("lexus") ||
+    t.includes("genesis")
+  )
+    return "Luxury & Performance";
+  if (
+    t.includes("sedan") ||
+    t.includes("coupe") ||
+    t.includes("hatchback") ||
+    t.includes("wagon")
+  )
+    return "Sedans & Coupes";
+  if (
+    t.includes("concept") ||
+    t.includes("design") ||
+    t.includes("prototype") ||
+    t.includes("styling")
+  )
+    return "Concepts & Design";
+  return "Automotive Industry";
 }
 
-const AI_TAGS = [
-  "ai", "artificial intelligence", "llm", "gpt", "chatgpt", "openai", "claude",
-  "gemini", "llama", "mistral", "machine learning", "deep learning", "neural",
-  "transformer", "diffusion", "agent", "rag", "fine-tuning", "embedding",
-  "llms & foundation models", "ai agents & tools", "machine learning research",
-  "ai engineering", "ai ethics & policy", "computer vision & generative ai",
-  "nlp & speech", "ai industry & business",
+const CAR_TAGS = [
+  "car", "cars", "vehicle", "suv", "sedan", "coupe", "truck", "electric vehicle",
+  "ev", "hybrid", "tesla", "ford", "chevrolet", "bmw", "mercedes", "audi", "porsche",
+  "ferrari", "lamborghini", "mclaren", "toyota", "honda", "hyundai", "kia",
+  "engine", "horsepower", "torque", "0-60", "top speed", "towing",
+  "sedans & coupes", "suvs & crossovers", "trucks & off-road",
+  "electric vehicles", "sports cars & supercars", "luxury & performance",
+  "concepts & design", "automotive industry",
 ];
 
-const NON_AI_TITLE_KEYWORDS = [
+const NON_CAR_TITLE_KEYWORDS = [
   "sport", "soccer", "football", "nba", "nfl", "olympic", "tennis", "cricket",
-  "election", "politics", "politician", "vote", "president", "congress", "senate",
+  "election", "politics", "politician", "vote", "president", "congress",
   "war", "military", "army", "weapon", "conflict", "attack", "terror",
-  "murder", "crime", "criminal", "fugitive", "suspect", "police", "arrest",
-  "movie", "film", "actor", "actress", "celebrity", "music", "album", "song",
-  "game", "gaming", "playoff", "championship", "tournament",
-  "weather", "hurricane", "storm", "earthquake", "flood",
-  "healthcare", "hospital", "disease", "cancer", "vaccine",
-  "burnham", "labour", "conservative", "tory", "democrat", "republican",
-  "nba", "espn", "bbc sport", "sky sport",
+  "murder", "crime", "criminal", "police", "arrest",
+  "movie", "film", "actor", "actress", "celebrity", "music", "album",
+  "weather", "hurricane", "storm", "earthquake",
+  "healthcare", "hospital", "disease", "cancer",
+  "ai", "llm", "chatgpt", "openai", "gpt", "machine learning",
 ];
 
-function isAiPost(p: { title: string; tags: string[] }): boolean {
+function isCarPost(p: { title: string; tags: string[] }): boolean {
   const title = p.title.toLowerCase();
   const tagText = p.tags.join(" ").toLowerCase();
 
-  // exclude if title has non-AI keywords
-  if (NON_AI_TITLE_KEYWORDS.some((kw) => title.includes(kw))) return false;
+  if (NON_CAR_TITLE_KEYWORDS.some((kw) => title.includes(kw))) return false;
 
-  // include if tags or title reference AI
-  return AI_TAGS.some((t) => title.includes(t) || tagText.includes(t));
+  return CAR_TAGS.some((t) => title.includes(t) || tagText.includes(t));
 }
 
 export async function getLocalPosts(): Promise<TrendingPost[]> {
   try {
     const posts = await getAllPosts();
     return posts
-      .filter(isAiPost)
+      .filter(isCarPost)
       .map((p) => ({
         slug: p.slug,
         title: p.title,
@@ -226,70 +246,70 @@ function getFallback(): TrendingPost[] {
   const today = new Date().toISOString().split("T")[0];
   return [
     {
-      slug: "ai-breakthrough-reasoning",
-      title: "AI Breakthrough: New Models Achieve Human-Level Reasoning",
+      slug: "2025-toyota-gr86-review",
+      title: "2025 Toyota GR86 Review: The Driver's Car That Refuses to Grow Up",
       date: today,
       excerpt:
-        "Recent advances in artificial intelligence have led to models that can perform complex reasoning tasks at human levels, marking a significant milestone in the field.",
-      source: "TechCrunch",
+        "The Toyota GR86 remains one of the purest driving experiences on the market. We break down the specs, the handling, and why it's still the benchmark for affordable sports cars.",
+      source: "Car and Driver",
       sourceUrl: "#",
-      category: "AI",
-      image: "https://picsum.photos/seed/aibreakthrough/800/450",
+      category: "Sports Cars & Supercars",
+      image: "https://picsum.photos/seed/gr86/800/450",
     },
     {
-      slug: "open-source-llm-benchmarks",
-      title: "Open Source LLMs Close the Gap: Benchmark Showdown 2024",
+      slug: "tesla-model-3-vs-hyundai-ioniq-6",
+      title: "Tesla Model 3 vs Hyundai Ioniq 6: The EV Sedan Battle",
       date: today,
       excerpt:
-        "Open source language models are matching proprietary alternatives on key benchmarks. We analyze the latest results from Llama, Mistral, and Qwen across reasoning, coding, and multilingual tasks.",
-      source: "The Verge",
+        "Two electric sedans, two very different philosophies. We compare range, charging, interior, and value to find out which one deserves your money.",
+      source: "MotorTrend",
       sourceUrl: "#",
-      category: "AI",
-      image: "https://picsum.photos/seed/opensourcellm/800/450",
+      category: "Electric Vehicles",
+      image: "https://picsum.photos/seed/model3vs6/800/450",
     },
     {
-      slug: "ai-agents-production",
-      title: "Building Reliable AI Agents: Lessons from Production Deployments",
+      slug: "best-trucks-2025",
+      title: "Best Trucks of 2025: F-150, Silverado, Tacoma, and More",
       date: today,
       excerpt:
-        "Companies deploying AI agents in production share patterns for handling hallucinations, tool use failures, and multi-step reasoning. A practical guide to agent architectures that work.",
-      source: "TechCrunch",
+        "From full-size haulers to midsize adventurers, we rank the best trucks you can buy right now based on towing, payload, features, and value.",
+      source: "Edmunds",
       sourceUrl: "#",
-      category: "AI",
-      image: "https://picsum.photos/seed/aiagents/800/450",
+      category: "Trucks & Off-Road",
+      image: "https://picsum.photos/seed/besttrucks/800/450",
     },
     {
-      slug: "rag-patterns-2024",
-      title: "RAG in Practice: Advanced Retrieval Patterns Beyond Naive Chunking",
+      slug: "porsche-911-gt3-rs-track",
+      title: "Porsche 911 GT3 RS: Track Weapon or Street Legal Overkill?",
       date: today,
       excerpt:
-        "Retrieval-Augmented Generation has evolved beyond basic chunk-and-embed. We explore reranking, hybrid search, agentic RAG, and the latest research on improving retrieval quality.",
-      source: "AI News",
+        "The GT3 RS is Porsche's most extreme road car. We take it to the track to see if the aero, the weight, and the price tag all add up.",
+      source: "Top Gear",
       sourceUrl: "#",
-      category: "AI",
-      image: "https://picsum.photos/seed/ragpatterns/800/450",
+      category: "Sports Cars & Supercars",
+      image: "https://picsum.photos/seed/gt3rs/800/450",
     },
     {
-      slug: "nvidia-blackwell-ai",
-      title: "NVIDIA Blackwell: What the Next-Gen Architecture Means for AI Workloads",
+      slug: "ford-f-150-lightning-vs-chevy-silverado-ev",
+      title: "Ford F-150 Lightning vs Chevy Silverado EV: Electric Truck Showdown",
       date: today,
       excerpt:
-        "NVIDIA's Blackwell architecture promises a leap in AI training and inference performance. We break down the specs, the benchmarks, and what it means for the AI industry.",
-      source: "TechCrunch",
+        "The two biggest names in trucks go electric. We compare range, towing, bed utility, and real-world usability to crown a winner.",
+      source: "The Drive",
       sourceUrl: "#",
-      category: "Tech",
-      image: "https://picsum.photos/seed/nvidiablackwell/800/450",
+      category: "Electric Vehicles",
+      image: "https://picsum.photos/seed/lightningvssilverado/800/450",
     },
     {
-      slug: "multimodal-models-comparison",
-      title: "Multimodal Models Compared: GPT-4V, Gemini, Claude, and Open Source Alternatives",
+      slug: "cheapest-suvs-2025",
+      title: "Cheapest SUVs of 2025 That Don't Feel Cheap",
       date: today,
       excerpt:
-        "A head-to-head comparison of leading multimodal models across vision, language, and reasoning tasks. We test real-world scenarios including document analysis, image understanding, and video comprehension.",
-      source: "The Verge",
+        "You don't need to spend a fortune to get a good SUV. Here are the best budget-friendly crossovers and SUVs that punch above their price.",
+      source: "Edmunds",
       sourceUrl: "#",
-      category: "AI",
-      image: "https://picsum.photos/seed/multimodal/800/450",
+      category: "SUVs & Crossovers",
+      image: "https://picsum.photos/seed/cheapsuvs/800/450",
     },
   ];
 }

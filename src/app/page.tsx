@@ -20,7 +20,7 @@ export default async function Home() {
     "@type": "WebSite",
     name: "MiziziNodes",
     url: siteUrl,
-    description: "In-depth AI research, LLM comparisons, agent tutorials, and original analysis of the AI landscape.",
+    description: "Trending car reviews, comparisons, specs, fastest cars, and automotive news — your daily dose of car culture.",
     potentialAction: {
       "@type": "SearchAction",
       target: `${siteUrl}/search?q={search_term_string}`,
@@ -99,7 +99,7 @@ function TrendingBar() {
       </span>
       <span className="w-px h-4 bg-zinc-300 dark:bg-zinc-700 shrink-0" />
       <span className="text-xs text-zinc-500 truncate">
-        Original stories by MiziziNodes
+        Latest car stories by MiziziNodes
       </span>
     </div>
   );

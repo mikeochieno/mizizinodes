@@ -21,10 +21,10 @@ const siteUrl = process.env.SITE_URL || "https://mizizinodes.vercel.app";
 
 export const metadata: Metadata = {
   title: {
-    default: "MiziziNodes — AI Research & Analysis",
+    default: "MiziziNodes — Cars, Reviews & Automotive News",
     template: "%s — MiziziNodes",
   },
-  description: "In-depth AI research, LLM comparisons, agent tutorials, and original analysis of the AI landscape.",
+  description: "Trending car reviews, comparisons, specs, fastest cars, and automotive news — your daily dose of car culture.",
   metadataBase: new URL(siteUrl),
   alternates: {
     types: {
@@ -34,15 +34,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "MiziziNodes",
-    title: "MiziziNodes — AI Research & Analysis",
-    description: "In-depth AI research, LLM comparisons, agent tutorials, and original analysis of the AI landscape.",
+    title: "MiziziNodes — Cars, Reviews & Automotive News",
+    description: "Trending car reviews, comparisons, specs, fastest cars, and automotive news — your daily dose of car culture.",
     url: siteUrl,
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: "MiziziNodes",
-    description: "In-depth AI research, LLM comparisons, agent tutorials, and original analysis.",
+    description: "Trending car reviews, comparisons, specs, fastest cars, and automotive news.",
   },
   robots: {
     index: true,

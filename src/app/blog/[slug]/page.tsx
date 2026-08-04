@@ -206,7 +206,7 @@ export default async function PostPage({ params }: Props) {
               <div>
                 <p className="font-semibold text-sm">MiziziNodes Editorial</p>
                 <p className="mt-1 text-sm text-zinc-500 leading-relaxed">
-                  In-depth analysis of the AI landscape — from LLM comparisons and agent tutorials to machine learning research and industry trends. We focus on original analysis, technical depth, and practical insights.
+                  Trending car reviews, comparisons, specs, fastest cars, and automotive news — your daily dose of car culture.
                 </p>
               </div>
             </div>

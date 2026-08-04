@@ -27,7 +27,7 @@ export default function NewsletterForm() {
     <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800/50">
       <h3 className="text-sm font-bold">Stay updated</h3>
       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-        Get the latest AI research and analysis delivered to your inbox.
+        Get the latest car reviews, comparisons, and automotive news delivered to your inbox.
       </p>
       {status === "success" ? (
         <p className="mt-3 text-sm font-medium text-green-600 dark:text-green-400">Thanks for subscribing!</p>

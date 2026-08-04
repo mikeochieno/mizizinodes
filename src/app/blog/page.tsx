@@ -6,7 +6,7 @@ import type { TrendingPost } from "@/lib/trending";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "All AI research articles and analysis — MiziziNodes",
+  description: "All car reviews, comparisons, and automotive news — MiziziNodes",
 };
 
 type Props = { searchParams: Promise<{ page?: string }> };

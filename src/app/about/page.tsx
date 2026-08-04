@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "About MiziziNodes — AI Research & Analysis",
+  description: "About MiziziNodes — Cars, Reviews & Automotive News",
 };
 
 export default function AboutPage() {
@@ -12,14 +12,13 @@ export default function AboutPage() {
         <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">About MiziziNodes</h1>
         <div className="mt-4 space-y-4 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           <p>
-            MiziziNodes delivers in-depth analysis of the AI landscape — from LLM comparisons and
-            agent tutorials to machine learning research and industry trends. We focus on original
-            analysis, technical depth, and practical insights for developers, researchers, and
-            builders working with AI.
+            MiziziNodes is your go-to source for everything cars — from in-depth reviews and
+            head-to-head comparisons to the fastest cars on the planet and the latest automotive
+            news. We cover specs, performance, design, and value so you can make smarter decisions.
           </p>
           <p>
-            Every article includes comparison, context, and critical assessment — not just
-            summarization. We cover models, tools, benchmarks, and techniques that matter right now.
+            Whether you&apos;re a gearhead, a casual buyer, or just love cars, we break down what matters
+            with clear analysis and real numbers — not just press releases.
           </p>
           <p>
             Built with Next.js, Tailwind CSS, and hosted on Vercel.

@@ -11,12 +11,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const postsDir = path.resolve(__dirname, "..", "content", "posts");
 
 const RSS_FEEDS = [
-  "https://hnrss.org/frontpage?q=ai+OR+llm+OR+gpt+OR+neural+OR+transformer+OR+diffusion+OR+agent+OR+rag+OR+fine+tuning+OR+openai+OR+claude+OR+gemini+OR+llama+OR+mistral+OR+deep+learning+OR+machine+learning+OR+generative",
-  "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml",
-  "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
-  "https://techcrunch.com/category/artificial-intelligence/feed/",
-  "https://www.artificialintelligence-news.com/feed/",
-  "https://hnrss.org/frontpage",
+  "https://www.caranddriver.com/rss/all/",
+  "https://www.motortrend.com/feed/",
+  "https://www.autoblog.com/rss.xml",
+  "https://www.topgear.com/rss",
+  "https://www.edmunds.com/rss/news/",
+  "https://www.jalopnik.com/rss",
+  "https://www.thedrive.com/feed",
+  "https://www.caranddriver.com/rss/all/",
 ];
 
 const parser = new Parser();
@@ -57,15 +59,15 @@ const PROVIDERS = [
   },
 ];
 
-const AI_CATEGORIES = [
-  "LLMs & Foundation Models",
-  "AI Agents & Tools",
-  "Machine Learning Research",
-  "AI Engineering",
-  "AI Ethics & Policy",
-  "Computer Vision & Generative AI",
-  "NLP & Speech",
-  "AI Industry & Business",
+const CAR_CATEGORIES = [
+  "Sedans & Coupes",
+  "SUVs & Crossovers",
+  "Trucks & Off-Road",
+  "Electric Vehicles",
+  "Sports Cars & Supercars",
+  "Luxury & Performance",
+  "Concepts & Design",
+  "Automotive Industry",
 ];
 
 function slugify(text) {
@@ -76,27 +78,29 @@ function slugify(text) {
     .slice(0, 60);
 }
 
-const AI_KEYWORDS = [
-  "ai", "artificial intelligence", "llm", "gpt", "chatgpt", "openai", "claude", "anthropic",
-  "gemini", "deepmind", "llama", "mistral", "stable diffusion", "midjourney", "sora",
-  "neural", "deep learning", "machine learning", "transformer", "diffusion",
-  "agent", "rag", "fine.tun", "embedding", "vector database", "langchain",
-  "copilot", "github copilot", "cursor", "windsurf", "bolt.new",
-  "nvidia", "blackwell", "h100", "h200", "b200", "tpu", "training",
-  "reasoning", "multimodal", "frontier model", "foundation model",
-  "inference", "open source model", "weight", "checkpoint",
-  "ml", "gen ai", "generative ai", "compute", "data center",
-  "gpu", "vllm", "triton", "pytorch", "tensorflow", "jax",
-  "hugging face", "cuda", "cann", "rocm", "oneapi",
-  "quantization", "pruning", "distillation", "speculative decoding",
-  "moe", "mixture of experts", "attention", "context window",
-  "grok", "x.ai", "xai", "perplexity", "notebooklm",
-  "elon musk ai", "meta ai", "apple intelligence",
+const CAR_KEYWORDS = [
+  "car", "cars", "vehicle", "automobile", "suv", "sedan", "coupe", "truck", "pickup",
+  "electric vehicle", "ev", "hybrid", "phev", "tesla", "ford", "chevrolet", "chevy",
+  "bmw", "mercedes", "audi", "porsche", "ferrari", "lamborghini", "mclaren",
+  "toyota", "honda", "hyundai", "kia", "nissan", "volkswagen", "vw",
+  "engine", "horsepower", "torque", "mpg", "range", "battery", "drivetrain",
+  "awd", "fwd", "rwd", "4wd", "transmission", "automatic", "manual",
+  "turbo", "supercharger", "v8", "v6", "electric motor", "battery pack",
+  "0-60", "top speed", "horsepower", "torque", "curb weight", "payload",
+  "towing", "bed", "cargo", "interior", "infotainment", "safety rating",
+  "crash test", "nhtsa", "iihs", "fuel economy", "epa", "emissions",
+  "new car", "used car", "review", "comparison", "test drive", "first drive",
+  "concept", "prototype", "production", "model year", "facelift", "refresh",
+  "rally", "motorsport", "f1", "nascar", "indycar", "le mans", "drift",
+  "off-road", "overland", "trail", "rock crawler", "mud", "suspension",
+  "brake", "tire", "wheel", "exhaust", "intake", "turbo kit", "mod",
+  "warranty", "recall", "dealership", "msrp", "invoice", "lease", "finance",
+  "car news", "automotive", "motor", "drive", "driving", "road test",
 ];
 
-function isAiRelated(title, source) {
+function isCarRelated(title, source) {
   const t = title.toLowerCase() + " " + source.toLowerCase();
-  return AI_KEYWORDS.some((kw) => t.includes(kw.toLowerCase()));
+  return CAR_KEYWORDS.some((kw) => t.includes(kw.toLowerCase()));
 }
 
 async function fetchTrending() {
@@ -105,7 +109,7 @@ async function fetchTrending() {
     try {
       const feed = await parser.parseURL(url);
       for (const item of feed.items.slice(0, 6)) {
-        if (item.title && item.link && isAiRelated(item.title, feed.title || "")) {
+        if (item.title && item.link && isCarRelated(item.title, feed.title || "")) {
           items.push({ title: item.title, link: item.link, source: feed.title });
         }
       }
@@ -116,29 +120,29 @@ async function fetchTrending() {
 
 function pickCategory(title, source) {
   const t = (title + " " + source).toLowerCase();
-  if (t.includes("agent") || t.includes("tool") || t.includes("autogpt") || t.includes("function call"))
-    return "AI Agents & Tools";
-  if (t.includes("llm") || t.includes("gpt") || t.includes("foundation model") || t.includes("claude") || t.includes("gemini") || t.includes("llama") || t.includes("mistral") || t.includes("transformer"))
-    return "LLMs & Foundation Models";
-  if (t.includes("ml") || t.includes("training") || t.includes("fine-tun") || t.includes("backprop") || t.includes("gradient") || t.includes("loss") || t.includes("dataset") || t.includes("reinforcement"))
-    return "Machine Learning Research";
-  if (t.includes("compute") || t.includes("vision") || t.includes("diffusion") || t.includes("generat") || t.includes("image") || t.includes("video") || t.includes("stable diffusion") || t.includes("sora"))
-    return "Computer Vision & Generative AI";
-  if (t.includes("nlp") || t.includes("speech") || t.includes("language model") || t.includes("translation") || t.includes("rag") || t.includes("embedding") || t.includes("semantic"))
-    return "NLP & Speech";
-  if (t.includes("ethic") || t.includes("safety") || t.includes("alignment") || t.includes("bias") || t.includes("regulation") || t.includes("policy") || t.includes("governance") || t.includes("open source"))
-    return "AI Ethics & Policy";
-  if (t.includes("engineer") || t.includes("deploy") || t.includes("infra") || t.includes("pipeline") || t.includes("mllm") || t.includes("optimiz") || t.includes("inference") || t.includes("serving"))
-    return "AI Engineering";
-  return "AI Industry & Business";
+  if (t.includes("electric") || t.includes("ev") || t.includes("battery") || t.includes("charger") || t.includes("tesla") || t.includes("range"))
+    return "Electric Vehicles";
+  if (t.includes("sports car") || t.includes("supercar") || t.includes("ferrari") || t.includes("lamborghini") || t.includes("mclaren") || t.includes("porsche") || t.includes("0-60") || t.includes("top speed"))
+    return "Sports Cars & Supercars";
+  if (t.includes("truck") || t.includes("pickup") || t.includes("off-road") || t.includes("towing") || t.includes("payload") || t.includes("4wd") || t.includes("overland"))
+    return "Trucks & Off-Road";
+  if (t.includes("suv") || t.includes("crossover") || t.includes("minivan"))
+    return "SUVs & Crossovers";
+  if (t.includes("luxury") || t.includes("bmw") || t.includes("mercedes") || t.includes("audi") || t.includes("lexus") || t.includes("genesis"))
+    return "Luxury & Performance";
+  if (t.includes("sedan") || t.includes("coupe") || t.includes("hatchback") || t.includes("wagon"))
+    return "Sedans & Coupes";
+  if (t.includes("concept") || t.includes("design") || t.includes("prototype") || t.includes("styling"))
+    return "Concepts & Design";
+  return "Automotive Industry";
 }
 
 function buildPrompt(topic, category) {
-  return `You are a senior AI researcher and tech journalist. Write a deep, original analysis piece about this trending AI topic:
+  return `You are an automotive journalist and car enthusiast. Write a compelling, in-depth article about this trending car topic:
 
 "${topic.title}" (source: ${topic.source})
 
-This article must NOT be a shallow summary. It must deliver original analysis, comparisons, context, and insight. Follow these requirements:
+This article must NOT be a shallow summary. It must deliver real insight, specs, comparisons, and opinion. Follow these requirements:
 
 STRUCTURE & FORMAT:
 - Title: a compelling, specific headline (not generic)
@@ -147,22 +151,23 @@ STRUCTURE & FORMAT:
 - Author: MiziziNodes Editorial
 - Excerpt: 2-3 sentence summary that hooks the reader and states the article's thesis — make it specific, not generic
 - Content: 1500-2000 words — well-structured with an introduction, 4-6 subheadings (##), and a conclusion
-- Use concrete examples, specific numbers, benchmark results, and named products/papers where possible
-- IMAGE_PROMPT: a short search query (10-20 words) to find a relevant photo — describe the scene/subject visually
+- Use concrete examples, specific numbers, specs (horsepower, torque, 0-60, price), and named models/brands where possible
+- IMAGE_PROMPT: a short search query (10-20 words) to find a relevant car photo — describe the scene/subject visually (e.g., "red Ferrari 296 GTB on mountain road at sunset")
 
 CONTENT REQUIREMENTS (must include ALL of these):
-1. COMPARISON: Compare this development with previous approaches or competing solutions (e.g., Claude vs GPT vs Gemini, PyTorch vs JAX, etc.) — use specific version numbers and benchmarks
-2. CONTEXT: Explain why this matters — what problem does it solve, what's the broader trend? Include relevant history
-3. CRITICAL ANALYSIS: Give your own assessment — what are the real limitations, trade-offs, or open questions? Don't just hype it
-4. TECHNICAL DEPTH: Include at least 2-3 concrete technical details (architecture choice, benchmark numbers, training method, API patterns, performance metrics, etc.)
-5. PRACTICAL IMPACT: How will this affect developers, researchers, or businesses? Give specific use cases
-6. FUTURE OUTLOOK: What's next? What questions remain unanswered?
+1. SPECS & NUMBERS: Include real performance data — horsepower, torque, 0-60 times, top speed, fuel economy, range, price, curb weight. Use comparison tables where possible
+2. COMPARISON: Compare this car/model/feature with direct competitors (e.g., Mustang vs Camaro vs Challenger, Model 3 vs Ioniq 6 vs Polestar 2) — use specific trim levels and pricing
+3. CONTEXT: Explain why this matters in the current market. What's the trend? Who is this car for?
+4. CRITICAL ASSESSMENT: Give your honest take — what's good, what's bad, what's missing? Don't just hype it
+5. PRACTICAL IMPACT: How does this affect buyers, enthusiasts, or the industry? Include real pricing, availability, and value proposition
+6. FUTURE OUTLOOK: What's next for this model/brand/segment? What questions remain?
 
 TONE & STYLE:
-- Analytical and insightful, not promotional
+- Enthusiastic but honest — like a knowledgeable friend who actually drives these cars
+- Use car enthusiast language naturally (torque curve, power band, chassis dynamics, etc.)
 - Acknowledge both strengths and weaknesses
-- Write in clear, engaging prose — aim for something between a Stratechery analysis and a Lilian Weng blog post
-- Include at least one direct comparison table or numbered list of key differences
+- Write in clear, engaging prose — aim for something between a Car and Driver review and a Regular Cars review
+- Include at least one comparison table or numbered list of key specs
 - Each section should have a clear argument, not just descriptive text
 
 Respond in this exact format:
@@ -182,7 +187,7 @@ function parseResponse(text) {
   const contentMatch = text.match(/CONTENT:\s*([\s\S]+)/);
   return {
     title: titleMatch?.[1]?.trim() || "",
-    tags: (tagsMatch?.[1]?.trim() || "ai").split(",").map((t) => t.trim().toLowerCase()),
+    tags: (tagsMatch?.[1]?.trim() || "automotive").split(",").map((t) => t.trim().toLowerCase()),
     excerpt: excerptMatch?.[1]?.trim() || "",
     imagePrompt: imageMatch?.[1]?.trim() || "",
     content: contentMatch?.[1]?.trim() || "",
@@ -364,7 +369,7 @@ async function generateWithFallback(topic, category) {
 }
 
 async function main() {
-  console.log("🔍 Fetching trending AI topics from RSS feeds...");
+  console.log("🔍 Fetching trending car topics from RSS feeds...");
   const trending = await fetchTrending();
 
   if (trending.length === 0) {
@@ -373,7 +378,7 @@ async function main() {
   }
 
   const available = PROVIDERS.filter((p) => p.apiKey());
-  console.log(`📰 Found ${trending.length} AI topics`);
+  console.log(`📰 Found ${trending.length} car topics`);
   console.log(`🔑 ${available.length} provider(s) configured: ${available.map((p) => p.name).join(", ") || "none"}`);
   console.log("");
 

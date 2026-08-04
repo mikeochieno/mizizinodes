@@ -20,7 +20,7 @@ export async function GET() {
 
   const feed = `<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Blog — Trending</title>
+  <title>MiziziNodes — Cars, Reviews & Automotive News</title>
   <link href="${baseUrl}/feed.xml" rel="self"/>
   <link href="${baseUrl}"/>
   <id>${baseUrl}/</id>
